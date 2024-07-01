@@ -4,4 +4,5 @@
 [飞书文档](https://pincman-classroom.feishu.cn/wiki/wikcnHURsQsZ3yxtJutQn29Nayg)
 
 - basic-crud 基本crud框架
+- decorator-crud Crud装饰器
 - main 所有代码
