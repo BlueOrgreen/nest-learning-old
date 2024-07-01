@@ -4,9 +4,7 @@ import { EntityNotFoundError } from 'typeorm';
 
 import { manualPaginate } from '@/modules/core/helpers';
 
-import { PaginateDto } from '@/modules/core/types';
-
-import { CreateCommentDto } from '../dtos';
+import { CreateCommentDto, QueryCommentDto } from '../dtos';
 
 import { CommentEntity } from '../entities';
 import { CommentRepository, PostRepository } from '../repositories';
@@ -24,17 +22,20 @@ export class CommentService {
     ) {}
 
     async findTrees({ post }: { post?: string }) {
-        return this.commentRepository.findTrees({ post });
+        const res = await this.commentRepository.findTrees({ post });
+        return res;
     }
 
     /**
      * 查找一篇文章的评论
      * @param param0
      */
-    async paginate(options: PaginateDto, post?: string) {
+    async paginate({ post, ...query }: QueryCommentDto) {
         const data = (await this.commentRepository.findRoots({ relations: ['post'] })).filter((c) =>
             !isNil(post) ? c.post.id === post : true,
         );
+        console.log(data);
+
         let comments: CommentEntity[] = [];
         for (let i = 0; i < data.length; i++) {
             const c = data[i];
@@ -42,7 +43,7 @@ export class CommentService {
             comments.push(await this.commentRepository.findDescendantsTree(c));
         }
         comments = await this.commentRepository.toFlatTrees(comments);
-        return manualPaginate(options, comments);
+        return manualPaginate(query, comments);
     }
 
     /**
@@ -65,6 +66,18 @@ export class CommentService {
     async delete(id: string) {
         const comment = await this.commentRepository.findOneOrFail({ where: { id } });
         return this.commentRepository.remove(comment);
+    }
+
+    /**
+     * 批量删除评论
+     * @param ids
+     * @param query
+     */
+    async deleteMulti(ids: string[], query: QueryCommentDto) {
+        for (const id of ids) {
+            await this.delete(id);
+        }
+        return this.paginate(query);
     }
 
     /**

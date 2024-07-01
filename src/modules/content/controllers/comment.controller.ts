@@ -13,6 +13,7 @@ import {
 import { OptionalUUIDPipe } from '@/modules/core/pipes';
 
 import { CreateCommentDto, QueryCommentDto } from '../dtos';
+import { DeleteCommentMultiDto } from '../dtos/delete-comment-multi.dto';
 import { CommentService } from '../services';
 
 /**
@@ -39,10 +40,8 @@ export class CommentController {
     async list(
         @Query()
         query: QueryCommentDto,
-        @Param('post', new OptionalUUIDPipe())
-        post?: string,
     ) {
-        return this.commentService.paginate(query, post);
+        return this.commentService.paginate(query);
     }
 
     @Post()
@@ -59,5 +58,15 @@ export class CommentController {
         comment: string,
     ) {
         return this.commentService.delete(comment);
+    }
+
+    @Delete()
+    async deleteMulti(
+        @Query()
+        query: QueryCommentDto,
+        @Body()
+        { items }: DeleteCommentMultiDto,
+    ) {
+        return this.commentService.deleteMulti(items, query);
     }
 }

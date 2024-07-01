@@ -1,43 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Transform } from 'class-transformer';
-import {
-    IsDefined,
-    IsNotEmpty,
-    IsOptional,
-    IsUUID,
-    MaxLength,
-    ValidateIf,
-    IsNumber,
-    Min,
-} from 'class-validator';
+import { IsDefined, IsNotEmpty, IsOptional, IsUUID, MaxLength, ValidateIf } from 'class-validator';
 
+import { IsModelExist } from '@/modules/core/constraints';
 import { DtoValidation } from '@/modules/core/decorators';
 
-import { tNumber } from '@/modules/core/helpers';
-import { PaginateDto } from '@/modules/core/types';
-
-/**
- * 评论列表分页查询验证
- */
-@Injectable()
-@DtoValidation({ type: 'query' })
-export class QueryCommentDto implements PaginateDto {
-    @IsUUID(undefined, { message: '分类ID格式错误' })
-    @IsOptional()
-    post?: string;
-
-    @Transform(({ value }) => tNumber(value))
-    @Min(1, { message: '当前页必须大于1' })
-    @IsNumber()
-    @IsOptional()
-    page = 1;
-
-    @Transform(({ value }) => tNumber(value))
-    @Min(1, { message: '每页显示数据必须大于1' })
-    @IsNumber()
-    @IsOptional()
-    limit = 10;
-}
+import { CommentEntity, PostEntity } from '../entities';
 
 /**
  * 添加评论数据验证
@@ -49,10 +17,12 @@ export class CreateCommentDto {
     @IsNotEmpty({ message: '评论内容不能为空' })
     body!: string;
 
+    @IsModelExist(PostEntity, { always: true, message: '指定的文章不存在' })
     @IsUUID(undefined, { message: '文章ID格式错误' })
     @IsDefined({ message: '评论文章ID必须指定' })
     post!: string;
 
+    @IsModelExist(CommentEntity, { always: true, message: '父评论不存在' })
     @IsUUID(undefined, { always: true, message: '父评论ID格式不正确' })
     @ValidateIf((value) => value.parent !== null && value.parent)
     @IsOptional({ always: true })

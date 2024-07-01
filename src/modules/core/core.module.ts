@@ -5,7 +5,13 @@ import { DataSource, ObjectType } from 'typeorm';
 
 import { AppFilter, AppInterceptor, AppPipe } from './app';
 import { CUSTOM_REPOSITORY_METADATA } from './constants';
-
+import {
+    ModelExistConstraint,
+    UniqueConstraint,
+    UniqueExistConstraint,
+    UniqueTreeConstraint,
+    UniqueTreeExistConstraint,
+} from './constraints';
 import { CoreOptions } from './types';
 
 export class CoreModule {
@@ -16,8 +22,7 @@ export class CoreModule {
     public static forRoot(options: CoreOptions = {}): DynamicModule {
         const imports: ModuleMetadata['imports'] = [];
         if (options.database) imports.push(TypeOrmModule.forRoot(options.database));
-
-        const providers: ModuleMetadata['providers'] = [
+        let providers: ModuleMetadata['providers'] = [
             {
                 provide: APP_PIPE,
                 useFactory: () =>
@@ -36,6 +41,16 @@ export class CoreModule {
                 useClass: AppInterceptor,
             },
         ];
+        if (options.database) {
+            providers = [
+                ...providers,
+                ModelExistConstraint,
+                UniqueConstraint,
+                UniqueExistConstraint,
+                UniqueTreeConstraint,
+                UniqueTreeExistConstraint,
+            ];
+        }
         return {
             global: true,
             imports,

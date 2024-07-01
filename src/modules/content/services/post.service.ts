@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { omit } from 'lodash';
 
-import { paginate } from 'nestjs-typeorm-paginate';
 import { In, IsNull, Not, SelectQueryBuilder } from 'typeorm';
 
-import { PaginateDto, QueryHook } from '@/modules/core/types';
+import { BaseService } from '@/modules/core/crud';
+import { QueryHook } from '@/modules/core/types';
 
 import { PostOrderType } from '../constants';
 import { CreatePostDto, QueryPostDto, UpdatePostDto } from '../dtos';
@@ -26,12 +26,16 @@ type FindParams = {
  * @class PostService
  */
 @Injectable()
-export class PostService {
+export class PostService extends BaseService<PostEntity, PostRepository, FindParams> {
+    protected enable_trash = true;
+
     constructor(
         protected postRepository: PostRepository,
         private categoryRepository: CategoryRepository,
         private categoryService: CategoryService,
-    ) {}
+    ) {
+        super(postRepository);
+    }
 
     /**
      * @description 添加文章
@@ -47,7 +51,7 @@ export class PostService {
                   })
                 : [],
         };
-        const item = await this.postRepository.save(createPostDto);
+        const item = await this.repository.save(createPostDto);
         return this.detail(item.id);
     }
 
@@ -59,13 +63,13 @@ export class PostService {
         const post = await this.detail(data.id);
         if (data.categories) {
             // 更新文章所属分类
-            await this.postRepository
+            await this.repository
                 .createQueryBuilder('post')
                 .relation(PostEntity, 'categories')
                 .of(post)
                 .addAndRemove(data.categories, post.categories ?? []);
         }
-        await this.postRepository.update(data.id, omit(data, ['id', 'categories']));
+        await this.repository.update(data.id, omit(data, ['id', 'categories']));
         return this.detail(data.id);
     }
 
@@ -75,7 +79,7 @@ export class PostService {
      * @param {QueryHook<PostEntity>} [callback]
      */
     protected async getItemQuery(callback?: QueryHook<PostEntity>) {
-        let query = this.postRepository.buildBaseQuery();
+        let query = this.repository.buildBaseQuery();
         if (callback) query = await callback(query);
         return query;
     }
@@ -104,75 +108,7 @@ export class PostService {
         if (category) {
             qb = await this.queryByCategory(category, qb);
         }
-        if (callback) return callback(qb);
-        return qb;
-    }
-
-    /**
-     * 获取文章列表
-     * @param params
-     * @param callback
-     */
-    async list(params?: FindParams, callback?: QueryHook<PostEntity>) {
-        const options = params ?? ({} as FindParams);
-        const qb = await this.buildListQuery(
-            this.postRepository.buildBaseQuery(),
-            options,
-            callback,
-        );
-        return qb.getMany();
-    }
-
-    /**
-     * 获取分页文章列表数据
-     * @param options
-     * @param callback
-     */
-    async paginate(options: PaginateDto & FindParams, callback?: QueryHook<PostEntity>) {
-        const queryOptions = options ?? ({} as PaginateDto & FindParams);
-        const query = await this.buildListQuery(
-            this.postRepository.buildBaseQuery(),
-            queryOptions,
-            callback,
-        );
-        return paginate(query, options);
-    }
-
-    /**
-     * 获取文章详情
-     * @param id
-     * @param callback
-     */
-    async detail(id: string, callback?: QueryHook<PostEntity>) {
-        const query = await this.buildItemQuery(this.postRepository.buildBaseQuery(), callback);
-        const qb = query.where('post.id = :id', { id });
-        const item = await qb.getOne();
-        if (!item) throw new NotFoundException(`The post ${id} not exists!`);
-        return item;
-    }
-
-    /**
-     * 删除文章
-     * @param id
-     */
-    async delete(id: string) {
-        const item = await this.postRepository.findOneOrFail({
-            where: { id },
-        });
-        return this.postRepository.remove(item);
-    }
-
-    /**
-     * 获取查询单个项目的QueryBuilder
-     * @param query
-     * @param callback
-     */
-    protected async buildItemQuery(
-        query: SelectQueryBuilder<PostEntity>,
-        callback?: QueryHook<PostEntity>,
-    ) {
-        if (callback) return callback(query);
-        return query;
+        return super.buildListQuery(qb, options);
     }
 
     /**

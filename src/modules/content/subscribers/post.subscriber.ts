@@ -1,5 +1,9 @@
 import { DataSource, EventSubscriber } from 'typeorm';
 
+import { BaseSubscriber } from '@/modules/core/crud';
+
+import { SubscriberSetting } from '@/modules/core/types';
+
 import { PostBodyType } from '../constants';
 import { PostEntity } from '../entities';
 import { PostRepository } from '../repositories/post.repository';
@@ -13,15 +17,19 @@ import { SanitizeService } from '../services';
  * @extends {BaseSubscriber<PostEntity>}
  */
 @EventSubscriber()
-export class PostSubscriber {
+export class PostSubscriber extends BaseSubscriber<PostEntity> {
+    protected entity = PostEntity;
+
+    protected setting: SubscriberSetting = {
+        trash: true,
+    };
+
     constructor(
         protected dataSource: DataSource,
         protected sanitizeService: SanitizeService,
         protected postRepository: PostRepository,
-    ) {}
-
-    listenTo() {
-        return PostEntity;
+    ) {
+        super(dataSource, postRepository);
     }
 
     /**

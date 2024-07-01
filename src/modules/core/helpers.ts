@@ -11,12 +11,12 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { isNil } from 'lodash';
 import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
-import { ObjectLiteral } from 'typeorm';
+import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
 import { appConfig } from '@/config';
 
 import { EnvironmentType } from './constants';
-import { PaginateDto, TimeOptions } from './types';
+import { OrderQueryType, PaginateDto, TimeOptions } from './types';
 
 dayjs.extend(localeData);
 dayjs.extend(utc);
@@ -132,4 +132,32 @@ export const getTime = (options?: TimeOptions) => {
     // 如果没有传入local或timezone则使用应用配置
     const now = dayjs(date, format, locale ?? config.locale, strict).clone();
     return now.tz(zonetime ?? config.timezone);
+};
+
+export const getOrderByQuery = <E extends ObjectLiteral>(
+    qb: SelectQueryBuilder<E>,
+    alias: string,
+    orderBy?: OrderQueryType,
+) => {
+    if (isNil(orderBy)) return qb;
+    if (typeof orderBy === 'string') return qb.orderBy(`${alias}.${orderBy}`, 'DESC');
+    if (Array.isArray(orderBy)) {
+        let q = qb;
+        const i = 0;
+        for (const item of orderBy) {
+            if (i === 0) {
+                q =
+                    typeof item === 'string'
+                        ? q.orderBy(`${alias}.${item}`, 'DESC')
+                        : q.orderBy(`${alias}.${item}`, item.order);
+            } else {
+                q =
+                    typeof item === 'string'
+                        ? q.addOrderBy(`${alias}.${item}`, 'DESC')
+                        : q.addOrderBy(`${alias}.${item}`, item.order);
+            }
+        }
+        return q;
+    }
+    return qb.orderBy(`${alias}.${(orderBy as any).name}`, (orderBy as any).order);
 };
