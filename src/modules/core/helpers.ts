@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import bcrypt from 'bcrypt';
 
 import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
@@ -13,7 +14,7 @@ import { isNil } from 'lodash';
 import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
 import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
-import { appConfig } from '@/config';
+import { appConfig, userConfig } from '@/config';
 
 import { EnvironmentType } from './constants';
 import { OrderQueryType, PaginateDto, TimeOptions } from './types';
@@ -160,4 +161,14 @@ export const getOrderByQuery = <E extends ObjectLiteral>(
         return q;
     }
     return qb.orderBy(`${alias}.${(orderBy as any).name}`, (orderBy as any).order);
+};
+
+// 加密明文密码
+export const encrypt = (password: string) => {
+    return bcrypt.hashSync(password, userConfig().hash);
+};
+
+// 验证密码
+export const decrypt = (password: string, hashed: string) => {
+    return bcrypt.compareSync(password, hashed);
 };

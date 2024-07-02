@@ -6,6 +6,7 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
+    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -15,6 +16,7 @@ import { PostBodyType } from '../constants';
 
 import { CategoryEntity } from './category.entity';
 import { CommentEntity } from './comment.entity';
+import { UserEntity } from '@/modules/user/entities/user.entity';
 
 /**
  * @description 文章模型
@@ -163,4 +165,12 @@ export class PostEntity extends BaseEntity {
     @Expose()
     @Column({ comment: '分类排序', default: 0 })
     customOrder!: number;
+
+    @Expose()
+    @ManyToOne(() => UserEntity, (user) => user.posts, {
+        nullable: false,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    author!: UserEntity;
 }

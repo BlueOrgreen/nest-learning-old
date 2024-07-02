@@ -12,7 +12,6 @@ import { OrderType, QueryTrashMode } from './constants';
 
 export type ClassType<T> = { new (...args: any[]): T };
 export type ClassToPlain<T> = { [key in keyof T]: T[key] };
-
 export interface CoreOptions {
     database?: TypeOrmModuleOptions;
 }
