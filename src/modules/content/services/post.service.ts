@@ -5,7 +5,11 @@ import { omit } from 'lodash';
 import { In, IsNull, Not, SelectQueryBuilder } from 'typeorm';
 
 import { BaseService } from '@/modules/core/crud';
-import { QueryHook } from '@/modules/core/types';
+import { ClassToPlain, QueryHook } from '@/modules/core/types';
+
+import { UserEntity } from '@/modules/user/entities';
+
+import { UserService } from '@/modules/user/services';
 
 import { PostOrderType } from '../constants';
 import { CreatePostDto, QueryPostDto, UpdatePostDto } from '../dtos';
@@ -33,6 +37,7 @@ export class PostService extends BaseService<PostEntity, PostRepository, FindPar
         protected postRepository: PostRepository,
         private categoryRepository: CategoryRepository,
         private categoryService: CategoryService,
+        private userService: UserService,
     ) {
         super(postRepository);
     }
@@ -41,9 +46,10 @@ export class PostService extends BaseService<PostEntity, PostRepository, FindPar
      * @description 添加文章
      * @param {CreatePostDto} data
      */
-    async create(data: CreatePostDto) {
+    async create({ data, author }: { data: CreatePostDto; author: ClassToPlain<UserEntity> }) {
         const createPostDto = {
             ...data,
+            author: await this.userService.getCurrentUser(author),
             // 文章所属分类
             categories: data.categories
                 ? await this.categoryRepository.findBy({

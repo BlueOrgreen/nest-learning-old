@@ -9,6 +9,7 @@ import * as EntityMaps from './entities';
 import * as RepositoryMaps from './repositories';
 import * as ServerMaps from './services';
 import * as SubscriberMaps from './subscribers';
+import { UserModule } from '../user/user.module';
 
 const entities = Object.values(EntityMaps);
 const repositories = Object.values(RepositoryMaps);
@@ -21,6 +22,7 @@ const controllers = Object.values(ControllerMaps);
         TypeOrmModule.forFeature(entities),
         // 注册自定义Repository
         CoreModule.forRepository(repositories),
+        UserModule,
     ],
     controllers,
     providers: [...subscribers, ...dtos, ...services],

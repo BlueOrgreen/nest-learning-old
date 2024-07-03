@@ -102,7 +102,7 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
         return paginate<UserEntity>(query, options);
     }
 
-    async getCurrentUser(user?: ClassToPlain<UserEntity>): Promise<UserEntity> {
+    async getCurrentUser(user: ClassToPlain<UserEntity>): Promise<UserEntity> {
         return this.userRepository.findOneOrFail({ where: { id: user.id } });
     }
 }

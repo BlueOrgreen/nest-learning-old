@@ -4,6 +4,8 @@ import { BaseController } from '@/modules/core/crud';
 
 import { Crud } from '@/modules/core/decorators';
 
+import { Guest } from '@/modules/user/decorators';
+
 import { CreateCategoryDto, QueryCategoryDto, UpdateCategoryDto } from '../dtos';
 import { CategoryService } from '../services';
 
@@ -15,8 +17,8 @@ import { CategoryService } from '../services';
 @Crud({
     id: 'category',
     enabled: [
-        'list',
-        'detail',
+        { name: 'list', option: { allowGuest: true } },
+        { name: 'detail', option: { allowGuest: true } },
         'store',
         'update',
         'delete',
@@ -37,6 +39,7 @@ export class CategoryController extends BaseController<CategoryService> {
     }
 
     @Get('tree')
+    @Guest()
     @SerializeOptions({ groups: ['category-tree'] })
     async index() {
         this.service;

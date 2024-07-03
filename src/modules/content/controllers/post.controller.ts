@@ -1,18 +1,16 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    ParseUUIDPipe,
-    Patch,
-    Post,
-    Query,
-    SerializeOptions,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+
+import { BaseController } from '@/modules/core/crud';
+
+import { Crud } from '@/modules/core/decorators';
+
+import { ClassToPlain } from '@/modules/core/types';
+import { ReqUser } from '@/modules/user/decorators';
+
+import { UserEntity } from '@/modules/user/entities';
 
 import { CreatePostDto, QueryPostDto, UpdatePostDto } from '../dtos';
-
+import { PostEntity } from '../entities/post.entity';
 import { PostService } from '../services';
 
 /**
@@ -21,50 +19,35 @@ import { PostService } from '../services';
  * @export
  * @class PostController
  */
-
+@Crud({
+    id: 'post',
+    enabled: [
+        { name: 'list', option: { allowGuest: true } },
+        { name: 'detail', option: { allowGuest: true } },
+        'store',
+        'update',
+        'delete',
+        'restore',
+        'deleteMulti',
+        'restoreMulti',
+    ],
+    dtos: {
+        query: QueryPostDto,
+        create: CreatePostDto,
+        update: UpdatePostDto,
+    },
+})
 @Controller('posts')
-export class PostController {
-    constructor(protected postService: PostService) {}
-
-    @Get()
-    @SerializeOptions({ groups: ['post-list'] })
-    async list(@Query() options: QueryPostDto) {
-        return this.postService.paginate(options);
-    }
-
-    @Get(':item')
-    @SerializeOptions({ groups: ['post-detail'] })
-    async detail(
-        @Param('item', new ParseUUIDPipe())
-        item: string,
-    ) {
-        return this.postService.detail(item);
+export class PostController extends BaseController<PostService> {
+    constructor(protected postService: PostService) {
+        super(postService);
     }
 
     @Post()
-    @SerializeOptions({ groups: ['post-detail'] })
     async store(
-        @Body()
-        data: CreatePostDto,
-    ) {
-        return this.postService.create(data);
-    }
-
-    @Patch()
-    @SerializeOptions({ groups: ['post-detail'] })
-    async update(
-        @Body()
-        data: UpdatePostDto,
-    ) {
-        return this.postService.update(data);
-    }
-
-    @Delete(':item')
-    @SerializeOptions({ groups: ['post-detail'] })
-    async delete(
-        @Param('item', new ParseUUIDPipe())
-        item: string,
-    ) {
-        return this.postService.delete(item);
+        @Body() data: CreatePostDto,
+        @ReqUser() author: ClassToPlain<UserEntity>,
+    ): Promise<PostEntity> {
+        return this.service.create({ data, author });
     }
 }
