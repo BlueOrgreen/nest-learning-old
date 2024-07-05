@@ -15,7 +15,7 @@ import { isNil } from 'lodash';
 
 import { IsModelExist } from '@/modules/core/constraints';
 import { DtoValidation } from '@/modules/core/decorators';
-import { tNumber } from '@/modules/core/helpers';
+import { tNumber } from '@/helpers';
 
 import { CategoryEntity } from '../entities';
 /**

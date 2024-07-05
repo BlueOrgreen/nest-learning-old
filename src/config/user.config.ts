@@ -1,5 +1,5 @@
 import { EnvironmentType } from '@/modules/core/constants';
-import { getRunEnv } from '@/modules/core/helpers';
+import { getRunEnv } from '@/helpers';
 import { UserConfig } from '@/modules/user/types';
 
 const expiredTime = getRunEnv() === EnvironmentType.DEVELOPMENT ? 3600 * 10000 : 3600;

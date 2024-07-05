@@ -13,7 +13,7 @@ import {
 
 import { OrderType } from '../constants';
 
-import { getOrderByQuery } from '../helpers';
+import { getOrderByQuery } from '@/helpers';
 
 import { OrderQueryType, TreeQueryParams } from '../types';
 

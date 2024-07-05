@@ -1,4 +1,4 @@
-import { setRunEnv } from '@/modules/core/helpers';
+import { setRunEnv } from '@/helpers';
 
 setRunEnv();
 export * from './app.config';

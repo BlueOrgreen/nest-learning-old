@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 import { IsBoolean, IsOptional } from 'class-validator';
 
 import { DtoValidation } from '@/modules/core/decorators';
-import { tBoolean } from '@/modules/core/helpers';
+import { tBoolean } from '@/helpers';
 
 /**
  * 数据删除

@@ -3,7 +3,7 @@ import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { OrderType } from '../constants';
 
-import { getOrderByQuery } from '../helpers';
+import { getOrderByQuery } from '@/helpers';
 import { OrderQueryType } from '../types';
 
 export abstract class BaseRepository<E extends ObjectLiteral> extends Repository<E> {

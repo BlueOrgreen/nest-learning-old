@@ -5,12 +5,13 @@ import { ExtractJwt } from 'passport-jwt';
 
 import { userConfig } from '@/config';
 import { EnvironmentType } from '@/modules/core/constants';
-import { decrypt, getRunEnv, getTime } from '@/modules/core/helpers';
+import { getRunEnv, getTime } from '@/helpers';
 
 import { UserEntity } from '../entities';
 
 import { TokenService } from './token.service';
 import { UserService } from './user.service';
+import { decrypt } from '@/modules/user/helpers';
 
 /**
  * 用户认证服务

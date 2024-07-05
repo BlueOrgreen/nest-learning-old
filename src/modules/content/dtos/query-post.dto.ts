@@ -5,7 +5,7 @@ import { IsBoolean, IsEnum, IsNumber, IsOptional, IsUUID, Min } from 'class-vali
 import { QueryTrashMode } from '@/modules/core/constants';
 import { IsModelExist } from '@/modules/core/constraints';
 import { DtoValidation } from '@/modules/core/decorators';
-import { tBoolean, tNumber } from '@/modules/core/helpers';
+import { tBoolean, tNumber } from '@/helpers';
 import { PaginateDto } from '@/modules/core/types';
 
 import { TrashedDto } from '../../core/types';

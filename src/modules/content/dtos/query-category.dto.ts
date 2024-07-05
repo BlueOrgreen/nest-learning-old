@@ -4,7 +4,7 @@ import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
 
 import { QueryTrashMode } from '@/modules/core/constants';
 import { DtoValidation } from '@/modules/core/decorators';
-import { tNumber } from '@/modules/core/helpers';
+import { tNumber } from '@/helpers';
 import { PaginateDto, TrashedDto } from '@/modules/core/types';
 
 /**

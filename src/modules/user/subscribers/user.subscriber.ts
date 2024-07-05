@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { DataSource, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
-import { encrypt } from '@/modules/core/helpers';
+import { encrypt } from '@/modules/user/helpers';
 
 import { SubscriberSetting } from '@/modules/core/types';
 

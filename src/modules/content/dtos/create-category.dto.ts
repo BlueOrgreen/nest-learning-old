@@ -5,7 +5,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsUUID, MaxLength, ValidateIf } from 
 import { IsModelExist, IsTreeUnique, IsTreeUniqueExist } from '@/modules/core/constraints';
 import { DtoValidation } from '@/modules/core/decorators';
 
-import { tNumber } from '@/modules/core/helpers';
+import { tNumber } from '@/helpers';
 
 import { CategoryEntity } from '../entities';
 

@@ -7,10 +7,11 @@ import { v4 as uuid } from 'uuid';
 
 import { userConfig } from '@/config';
 
-import { getTime } from '@/modules/core/helpers';
+// import { getTime } from '@/helpers';
 
 import { AccessTokenEntity, RefreshTokenEntity, UserEntity } from '../entities';
 import { JwtConfig, JwtPayload } from '../types';
+import { getTime } from '@/helpers';
 
 /**
  * 令牌服务

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { isNil, unset } from 'lodash';
 import { EntityNotFoundError } from 'typeorm';
 
-import { manualPaginate } from '@/modules/core/helpers';
+import { manualPaginate } from '@/helpers';
 
 import { CreateCommentDto, QueryCommentDto } from '../dtos';
 

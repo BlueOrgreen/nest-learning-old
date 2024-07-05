@@ -4,7 +4,7 @@ import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { IsNull, Not, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
 import { QueryTrashMode } from '../constants';
-import { manualPaginate } from '../helpers';
+import { manualPaginate } from '@/helpers';
 import { PaginateDto, QueryHook, QueryListParams, QueryParams } from '../types';
 
 import { BaseRepository } from './repository';

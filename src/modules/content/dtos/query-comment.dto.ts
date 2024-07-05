@@ -5,7 +5,7 @@ import { IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 
 import { IsModelExist } from '@/modules/core/constraints';
 import { DtoValidation } from '@/modules/core/decorators';
-import { tNumber } from '@/modules/core/helpers';
+import { tNumber } from '@/helpers';
 import { PaginateDto } from '@/modules/core/types';
 
 import { PostEntity } from '../entities';

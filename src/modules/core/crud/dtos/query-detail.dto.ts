@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsOptional } from 'class-validator';
 
-import { tBoolean } from '../../helpers';
+import { tBoolean } from '@/helpers';
 /**
  * 详情查询
  */

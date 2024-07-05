@@ -3,7 +3,7 @@ import { isNil, omit } from 'lodash';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { EntityNotFoundError } from 'typeorm';
 
-import { manualPaginate } from '@/modules/core/helpers';
+import { manualPaginate } from '@/helpers';
 import { PaginateDto } from '@/modules/core/types';
 
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
