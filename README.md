@@ -2,6 +2,7 @@
 > 文档请自行查看飞书文档
 
 [飞书文档](https://pincman-classroom.feishu.cn/wiki/wikcnHURsQsZ3yxtJutQn29Nayg)
+[代码地址nestjs-2022](https://git.3rcd.com/classroom/nestjs-2022)
 
 - basic-crud 基本crud框架
 - decorator-crud Crud装饰器
