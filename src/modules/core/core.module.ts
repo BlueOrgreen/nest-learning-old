@@ -2,7 +2,7 @@ import { DynamicModule, ModuleMetadata, Provider, Type } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource, ObjectType } from 'typeorm';
-
+import { BullModule } from '@nestjs/bullmq';
 import { AppFilter, AppInterceptor, AppPipe } from './app';
 import { CUSTOM_REPOSITORY_METADATA } from './constants';
 import {
@@ -13,6 +13,9 @@ import {
     UniqueTreeExistConstraint,
 } from './constraints';
 import { CoreOptions } from './types';
+import { createQueueOptions, createRedisOptions } from '@/helpers';
+import { isArray, isNil, omit } from 'lodash';
+import { RedisService } from './services';
 
 export class CoreModule {
     /**
@@ -20,7 +23,7 @@ export class CoreModule {
      * @param options
      */
     public static forRoot(options: CoreOptions = {}): DynamicModule {
-        const imports: ModuleMetadata['imports'] = [];
+        let imports: ModuleMetadata['imports'] = [];
         if (options.database) imports.push(TypeOrmModule.forRoot(options.database));
         let providers: ModuleMetadata['providers'] = [
             {
@@ -41,6 +44,8 @@ export class CoreModule {
                 useClass: AppInterceptor,
             },
         ];
+        const exps: ModuleMetadata['exports'] = [];
+
         if (options.database) {
             providers = [
                 ...providers,
@@ -51,10 +56,38 @@ export class CoreModule {
                 UniqueTreeExistConstraint,
             ];
         }
+        if (options.redis) {
+            const redis = createRedisOptions(options.redis());
+            if (!isNil(redis)) {
+                providers.push({
+                    provide: RedisService,
+                    useFactory: () => {
+                        const service = new RedisService(redis);
+                        service.createClients();
+                        return service;
+                    },
+                });
+                exps.push(RedisService);
+                if (options.queue) {
+                    const queue = createQueueOptions(options.queue(), redis);
+                    console.log('queue===>', queue);
+                    if (!isNil(queue)) {
+                        if (isArray(queue)) {
+                            imports = queue.map((v) =>
+                                BullModule.forRoot(v.name, omit(v, ['name'])),
+                            );
+                        } else {
+                            imports.push(BullModule.forRoot(queue));
+                        }
+                    }
+                }
+            }
+        }
         return {
             global: true,
             imports,
             providers,
+            exports: exps,
             module: CoreModule,
         };
     }

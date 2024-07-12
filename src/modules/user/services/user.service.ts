@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { isNil } from 'lodash';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
@@ -6,9 +6,15 @@ import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { BaseService } from '@/modules/core/crud';
 import { ClassToPlain, QueryHook } from '@/modules/core/types';
 
-import { CreateUserDto, UpdateUserDto } from '../dtos';
+import { CreateUserDto, QueryUserDto, UpdateUserDto } from '../dtos';
 import { UserEntity } from '../entities';
 import { UserRepository } from '../repositories';
+import { UpdatePassword } from '../dtos/account.dto';
+
+// 用户查询接口
+type FindParams = {
+    [key in keyof Omit<QueryUserDto, 'limit' | 'page'>]: QueryUserDto[key];
+};
 
 /**
  * 用户管理服务
@@ -22,21 +28,21 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
     }
 
     async init() {
-        const old = await this.findOneByCredential('pincman');
+        const old = await this.findOneByCredential('yunfan');
         if (!isNil(old)) {
             const admin = await this.update({
                 id: old.id,
-                username: 'pincman',
-                password: '123456aA$',
-                email: 'pincman@qq.com',
+                username: 'yunfan',
+                password: '12345678',
+                email: '1936341390@qq.com',
             });
             return admin;
         }
         return this.create({
             username: 'pincman',
-            password: '123456aA$',
-            email: 'pincman@qq.com',
-        });
+            password: '12345678',
+            email: '1936341390@qq.com',
+        } as unknown as CreateUserDto);
     }
 
     /**
@@ -55,6 +61,22 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
     async update({ id, ...data }: UpdateUserDto) {
         await this.userRepository.update(id, data);
         return this.detail(id);
+    }
+
+    /**
+     * 更新用户密码
+     * @param user
+     * @param param1
+     */
+    async updatePassword(user: UserEntity, { password, oldPassword }: UpdatePassword) {
+        const item = await this.findOneByCondition({ id: user.id }, async (query) =>
+            query.addSelect('user.password'),
+        );
+        if (item?.password !== oldPassword)
+            throw new ForbiddenException('old password not matched');
+        item.password = password;
+        await this.userRepository.save(item);
+        return item;
     }
 
     /**
@@ -104,5 +126,25 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
 
     async getCurrentUser(user: ClassToPlain<UserEntity>): Promise<UserEntity> {
         return this.userRepository.findOneOrFail({ where: { id: user.id } });
+    }
+
+    /**
+     * 根据参数构建查询用户列表的Query
+     * @param params
+     */
+    protected async getListQuery(params: FindParams = {}) {
+        const { actived, orderBy } = params;
+        const condition: { [key: string]: any } = {};
+        let query = this.userRepository.buildBaseQuery();
+        if (actived !== undefined && typeof actived === 'boolean') {
+            condition['user.actived'] = actived;
+        }
+        if (orderBy) {
+            query = query.orderBy(`user.${orderBy}`, 'ASC');
+        }
+        if (Object.keys(condition).length > 0) {
+            query = query.where(condition);
+        }
+        return query;
     }
 }

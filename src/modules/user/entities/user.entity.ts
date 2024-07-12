@@ -66,4 +66,10 @@ export class UserEntity extends BaseEntity {
 
     @Expose()
     trashed!: boolean;
+
+    @Column({ comment: '手机号', nullable: true, unique: true })
+    phone?: string;
+
+    @Column({ comment: '用户状态,是否激活', default: true })
+    actived?: boolean;
 }
