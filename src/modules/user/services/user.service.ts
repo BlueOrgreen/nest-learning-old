@@ -6,10 +6,9 @@ import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { BaseService } from '@/modules/core/crud';
 import { ClassToPlain, QueryHook } from '@/modules/core/types';
 
-import { CreateUserDto, QueryUserDto, UpdateUserDto } from '../dtos';
+import { CreateUserDto, QueryUserDto, UpdatePassword, UpdateUserDto } from '../dtos';
 import { UserEntity } from '../entities';
 import { UserRepository } from '../repositories';
-import { UpdatePassword } from '../dtos/account.dto';
 
 // 用户查询接口
 type FindParams = {
@@ -28,20 +27,20 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
     }
 
     async init() {
-        const old = await this.findOneByCredential('yunfan');
+        const old = await this.findOneByCredential('pincman');
         if (!isNil(old)) {
             const admin = await this.update({
                 id: old.id,
-                username: 'yunfan',
-                password: '12345678',
-                email: '1936341390@qq.com',
+                username: 'pincman',
+                password: '123456aA$',
+                email: 'pincman@qq.com',
             });
             return admin;
         }
         return this.create({
             username: 'pincman',
-            password: '12345678',
-            email: '1936341390@qq.com',
+            password: '123456aA$',
+            email: 'pincman@qq.com',
         } as unknown as CreateUserDto);
     }
 
@@ -58,9 +57,9 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
      * 更新用户
      * @param data
      */
-    async update({ id, ...data }: UpdateUserDto) {
-        await this.userRepository.update(id, data);
-        return this.detail(id);
+    async update(data: UpdateUserDto) {
+        const user = await this.userRepository.save(data);
+        return this.detail(user.id);
     }
 
     /**
@@ -124,7 +123,7 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
         return paginate<UserEntity>(query, options);
     }
 
-    async getCurrentUser(user: ClassToPlain<UserEntity>): Promise<UserEntity> {
+    async getCurrentUser(user?: ClassToPlain<UserEntity>): Promise<UserEntity> {
         return this.userRepository.findOneOrFail({ where: { id: user.id } });
     }
 

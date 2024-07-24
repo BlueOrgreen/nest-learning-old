@@ -3,11 +3,11 @@ import crypto from 'crypto';
 import { DataSource, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
-import { encrypt } from '@/modules/user/helpers';
 
-import { SubscriberSetting } from '@/modules/core/types';
+import { SubcriberSetting } from '@/modules/core/types';
 
 import { UserEntity } from '../entities/user.entity';
+import { encrypt } from '../helpers';
 import { UserRepository } from '../repositories';
 
 /**
@@ -17,7 +17,7 @@ import { UserRepository } from '../repositories';
 export class UserSubscriber extends BaseSubscriber<UserEntity> {
     protected entity = UserEntity;
 
-    protected setting: SubscriberSetting = {
+    protected setting: SubcriberSetting = {
         trash: true,
     };
 
@@ -26,10 +26,20 @@ export class UserSubscriber extends BaseSubscriber<UserEntity> {
     }
 
     /**
+     * 生成不重复的随机用户名
+     * @param event
+     */
+    protected async generateUserName(event: InsertEvent<UserEntity>): Promise<string> {
+        const username = `user_${crypto.randomBytes(4).toString('hex').slice(0, 8)}`;
+        const user = await event.manager.findOne(UserEntity, {
+            where: { username },
+        });
+        return !user ? username : this.generateUserName(event);
+    }
+
+    /**
      * 自动生成唯一用户名和密码
-     *
-     * @param {InsertEvent<UserEntity>} event
-     * @memberof UserSubscriber
+     * @param event
      */
     async beforeInsert(event: InsertEvent<UserEntity>) {
         // 自动生成唯一用户名
@@ -47,9 +57,7 @@ export class UserSubscriber extends BaseSubscriber<UserEntity> {
 
     /**
      * 当密码更改时加密密码
-     *
-     * @param {UpdateEvent<UserEntity>} event
-     * @memberof UserSubscriber
+     * @param event
      */
     async beforeUpdate(event: UpdateEvent<UserEntity>) {
         if (this.isUpdated('password', event)) {
@@ -57,19 +65,7 @@ export class UserSubscriber extends BaseSubscriber<UserEntity> {
         }
     }
 
-    /**
-     * 生成不重复的随机用户名
-     *
-     * @protected
-     * @param {InsertEvent<UserEntity>} event
-     * @return {*}  {Promise<string>}
-     * @memberof UserSubscriber
-     */
-    protected async generateUserName(event: InsertEvent<UserEntity>): Promise<string> {
-        const username = `user_${crypto.randomBytes(4).toString('hex').slice(0, 8)}`;
-        const user = await event.manager.findOne(UserEntity, {
-            where: { username },
-        });
-        return !user ? username : this.generateUserName(event);
+    protected isUpdated<E>(cloumn: keyof E, event: UpdateEvent<E>): any {
+        return event.updatedColumns.find((item) => item.propertyName === cloumn);
     }
 }

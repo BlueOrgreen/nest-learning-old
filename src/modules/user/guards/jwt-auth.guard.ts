@@ -52,7 +52,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             // 刷新成功则给请求头更换新的token
             // 并给响应头添加新的token和refreshtoken
             const token = await this.tokenService.refreshToken(accessToken, response);
-            if (isNil(token)) throw new UnauthorizedException();
+            if (isNil(token)) return false;
             if (token.accessToken) {
                 request.headers.authorization = `Bearer ${token.accessToken.value}`;
             }

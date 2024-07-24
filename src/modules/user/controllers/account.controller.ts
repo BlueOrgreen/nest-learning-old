@@ -1,21 +1,12 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Patch,
-    Post,
-    SerializeOptions,
-    Request,
-    UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, SerializeOptions } from '@nestjs/common';
 
 import { ClassToPlain } from '@/modules/core/types';
 
+import { CaptchaType } from '../constants';
 import { Guest, ReqUser } from '../decorators';
 
-import { CredentialDto, UpdateAccountDto } from '../dtos';
+import { EmailBoundDto, PhoneBoundDto, UpdateAccountDto, UpdatePassword } from '../dtos';
 import { UserEntity } from '../entities';
-import { LocalAuthGuard } from '../guards';
 import { AuthService, UserService } from '../services';
 
 /**
@@ -35,22 +26,6 @@ export class AccountController {
     })
     async init(): Promise<UserEntity> {
         return this.userService.init();
-    }
-
-    @Post('login')
-    @Guest()
-    @UseGuards(LocalAuthGuard)
-    async login(@ReqUser() user: ClassToPlain<UserEntity>, @Body() _data: CredentialDto) {
-        return { token: await this.authService.createToken(user.id) };
-    }
-
-    /**
-     * 注销登录
-     * @param req
-     */
-    @Post('logout')
-    async logout(@Request() req: any) {
-        return this.authService.logout(req);
     }
 
     /**
@@ -80,5 +55,61 @@ export class AccountController {
         data: UpdateAccountDto,
     ) {
         return this.userService.update({ id: user.id, ...data });
+    }
+
+    /**
+     * 更改密码
+     * @param user
+     * @param data
+     */
+    @Patch('reset-passowrd')
+    @SerializeOptions({
+        groups: ['user-detail'],
+    })
+    async resetPassword(
+        @ReqUser() user: ClassToPlain<UserEntity>,
+        @Body() data: UpdatePassword,
+    ): Promise<UserEntity> {
+        return this.userService.updatePassword(user, data);
+    }
+
+    /**
+     * 绑定或更改手机号
+     * @param user
+     * @param data
+     */
+    @Patch('bound-phone')
+    @SerializeOptions({
+        groups: ['user-detail'],
+    })
+    async boundPhone(
+        @ReqUser() user: ClassToPlain<UserEntity>,
+        @Body() data: PhoneBoundDto,
+    ): Promise<UserEntity> {
+        return this.authService.boundCaptcha(user, {
+            ...data,
+            type: CaptchaType.SMS,
+            value: data.phone,
+        });
+    }
+
+    /**
+     * 绑定或更改邮箱
+     * @param user
+     * @param data
+     */
+    @Patch('bound-email')
+    @SerializeOptions({
+        groups: ['user-detail'],
+    })
+    async boundEmail(
+        @ReqUser() user: ClassToPlain<UserEntity>,
+        @Body() data: EmailBoundDto,
+    ): Promise<UserEntity> {
+        return this.authService.boundCaptcha(user, {
+            ...data,
+            type: CaptchaType.EMAIL,
+            value: data.email,
+        });
     }
 }

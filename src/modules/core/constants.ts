@@ -20,24 +20,6 @@ export enum QueryTrashMode {
 export const CRUD_OPTIONS = 'crud_options';
 
 /**
- * 排序方式
- */
-export enum OrderType {
-    ASC = 'ASC',
-    DESC = 'DESC',
-}
-
-/**
- * 运行环境
- */
-export enum EnvironmentType {
-    DEVELOPMENT = 'development',
-    PRODUCTION = 'production',
-    TEST = 'test',
-    PREVIEW = 'preview',
-}
-
-/**
  * 允许游客访问的装饰器常量
  */
 export const ALLOW_GUEST = 'allowGuest';

@@ -4,24 +4,63 @@
 import { Type } from '@nestjs/common';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ClassTransformOptions } from 'class-transformer';
-import dayjs from 'dayjs';
 import Email from 'email-templates';
-import { IPaginationMeta, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { FindTreeOptions, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { Attachment } from 'nodemailer/lib/mailer';
-import { OrderType, QueryTrashMode } from './constants';
-import { QueueOptions, RedisOptions } from '@/helpers/types';
+import { FindTreeOptions, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
-export type ClassType<T> = { new (...args: any[]): T };
-export type ClassToPlain<T> = { [key in keyof T]: T[key] };
+import { OrderQueryType, QueueOptions, RedisOptions } from '@/helpers/types';
+
+import { QueryTrashMode } from './constants';
+
+/** ****************************** 常用类型 **************************** */
+
 /**
- * 嵌套对象
+ * 一个类的类型
  */
-export type NestedRecord = Record<string, Record<string, any>>;
+export type ClassType<T> = { new (...args: any[]): T };
+
+/**
+ * 类转义为普通对象后的类型
+ */
+export type ClassToPlain<T> = { [key in keyof T]: T[key] };
+
 /**
  * 空对象
  */
 export type RecordNever = Record<never, never>;
+/**
+ * 获取数组中元素的类型
+ */
+export type ArrayItem<A> = A extends readonly (infer T)[] ? T : never;
+
+/**
+ * 嵌套对象
+ */
+export type NestedRecord = Record<string, Record<string, any>>;
+
+/** ****************************** 配置选项 **************************** */
+/**
+ * core模块参数选项
+ */
+export interface CoreOptions {
+    database?: () => TypeOrmModuleOptions;
+    queue?: () => QueueOptions;
+    sms?: () => SmsOptions;
+    smtp?: () => SmtpOptions;
+    redis?: () => RedisOptions;
+}
+
+/**
+ * 腾讯云短信驱动配置
+ */
+export type SmsOptions<T extends NestedRecord = RecordNever> = {
+    secretId: string;
+    secretKey: string;
+    sign: string;
+    appid: string;
+    region: string;
+    endpoint?: string;
+} & T;
 
 /**
  * 发送接口参数
@@ -37,18 +76,6 @@ export interface SmsSendParams {
     SessionContext?: string;
     SenderId?: string;
 }
-
-/**
- * 腾讯云短信驱动配置
- */
-export type SmsOptions<T extends NestedRecord = RecordNever> = {
-    secretId: string;
-    secretKey: string;
-    sign: string;
-    appid: string;
-    region: string;
-    endpoint?: string;
-} & T;
 
 /**
  * SMTP邮件发送配置
@@ -92,34 +119,13 @@ export interface SmtpSendParams {
     attachments?: Attachment[];
 }
 
-export interface CoreOptions {
-    database?: TypeOrmModuleOptions;
-    queue?: () => QueueOptions;
-    sms?: () => SmsOptions;
-    smtp?: () => SmtpOptions;
-    redis?: () => RedisOptions;
-}
-/** ****************************** 数据请求 **************************** */
-/**
- * 分页验证DTO接口
- *
- * @export
- * @interface PaginateDto
- */
-export interface PaginateDto<C extends IPaginationMeta = IPaginationMeta>
-    extends Omit<IPaginationOptions<C>, 'page' | 'limit'> {
-    page: number;
-    limit: number;
-}
-
+/** ****************************** 数据操作 **************************** */
 /**
  * 软删除DTO接口
  */
 export interface TrashedDto {
     trashed?: QueryTrashMode;
 }
-
-/** ****************************** 数据操作 **************************** */
 
 /**
  * 为query添加查询的回调函数接口
@@ -128,28 +134,10 @@ export type QueryHook<Entity> = (
     hookQuery: SelectQueryBuilder<Entity>,
 ) => Promise<SelectQueryBuilder<Entity>>;
 
-export interface TimeOptions {
-    date?: dayjs.ConfigType;
-    format?: dayjs.OptionType;
-    locale?: string;
-    strict?: boolean;
-    zonetime?: string;
-}
-
 export interface AppConfig {
     timezone: string;
     locale: string;
 }
-
-/**
- * 排序类型,{字段名称: 排序方法}
- * 如果多个值则传入数组即可
- * 排序方法不设置,默认DESC
- */
-export type OrderQueryType =
-    | string
-    | { name: string; order: `${OrderType}` }
-    | Array<{ name: string; order: `${OrderType}` } | string>;
 
 /**
  * 数据列表查询类型
@@ -175,7 +163,7 @@ export type QueryListParams<E extends ObjectLiteral> = Omit<TreeQueryParams<E>, 
 /**
  * subscriber设置属性
  */
-export type SubscriberSetting = {
+export type SubcriberSetting = {
     // 监听的模型是否为树模型
     tree?: boolean;
     // 是否支持软删除

@@ -62,7 +62,7 @@ export class CategoryEntity extends BaseEntity {
     @Expose()
     @Type(() => Date)
     @DeleteDateColumn({
-        comment: '创建时间',
+        comment: '删除时间',
     })
     deletedAt!: Date;
 

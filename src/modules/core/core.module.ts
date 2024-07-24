@@ -1,21 +1,23 @@
+import { BullModule } from '@nestjs/bullmq';
 import { DynamicModule, ModuleMetadata, Provider, Type } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { getDataSourceToken, TypeOrmModule } from '@nestjs/typeorm';
+import { isArray, omit, isNil } from 'lodash';
 import { DataSource, ObjectType } from 'typeorm';
-import { BullModule } from '@nestjs/bullmq';
-import { AppFilter, AppInterceptor, AppPipe } from './app';
+
+import { createQueueOptions, createRedisOptions } from '@/helpers';
+
+import { AppFilter, AppIntercepter, AppPipe } from './app';
 import { CUSTOM_REPOSITORY_METADATA } from './constants';
 import {
     ModelExistConstraint,
     UniqueConstraint,
-    UniqueExistConstraint,
+    UniqueExistContraint,
     UniqueTreeConstraint,
     UniqueTreeExistConstraint,
 } from './constraints';
+import { SmsService, SmtpService, RedisService } from './services';
 import { CoreOptions } from './types';
-import { createQueueOptions, createRedisOptions } from '@/helpers';
-import { isArray, isNil, omit } from 'lodash';
-import { RedisService } from './services';
 
 export class CoreModule {
     /**
@@ -24,7 +26,7 @@ export class CoreModule {
      */
     public static forRoot(options: CoreOptions = {}): DynamicModule {
         let imports: ModuleMetadata['imports'] = [];
-        if (options.database) imports.push(TypeOrmModule.forRoot(options.database));
+
         let providers: ModuleMetadata['providers'] = [
             {
                 provide: APP_PIPE,
@@ -41,17 +43,19 @@ export class CoreModule {
             },
             {
                 provide: APP_INTERCEPTOR,
-                useClass: AppInterceptor,
+                useClass: AppIntercepter,
             },
         ];
+
         const exps: ModuleMetadata['exports'] = [];
 
         if (options.database) {
+            imports.push(TypeOrmModule.forRoot(options.database()));
             providers = [
                 ...providers,
                 ModelExistConstraint,
                 UniqueConstraint,
-                UniqueExistConstraint,
+                UniqueExistContraint,
                 UniqueTreeConstraint,
                 UniqueTreeExistConstraint,
             ];
@@ -70,7 +74,6 @@ export class CoreModule {
                 exps.push(RedisService);
                 if (options.queue) {
                     const queue = createQueueOptions(options.queue(), redis);
-                    console.log('queue===>', queue);
                     if (!isNil(queue)) {
                         if (isArray(queue)) {
                             imports = queue.map((v) =>
@@ -82,6 +85,21 @@ export class CoreModule {
                     }
                 }
             }
+        }
+
+        if (options.sms) {
+            providers.push({
+                provide: SmsService,
+                useFactory: () => new SmsService(options.sms()),
+            });
+            exps.push(SmsService);
+        }
+        if (options.smtp) {
+            providers.push({
+                provide: SmtpService,
+                useFactory: () => new SmtpService(options.smtp()),
+            });
+            exps.push(SmtpService);
         }
         return {
             global: true,

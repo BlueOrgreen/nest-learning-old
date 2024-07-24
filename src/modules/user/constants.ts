@@ -1,17 +1,19 @@
 /**
- * 验证码操作类别
+ * 用户列表查询排序方式
  */
-export enum CaptchaActionType {
-    // 登录操作
-    LOGIN = 'login',
-    // 注册操作
-    REGISTER = 'register',
-    // 找回密码操作
-    RETRIEVEPASSWORD = 'retrieve-password',
-    // 重置密码操作
-    RESETPASSWORD = 'reset-password',
-    // 手机号或邮箱地址绑定操作
-    ACCOUNTBOUND = 'account-bound',
+export enum UserOrderType {
+    CREATED = 'createdAt',
+    UPDATED = 'updatedAt',
+}
+
+/**
+ * 用户请求DTO验证组
+ */
+export enum UserDtoGroups {
+    REGISTER = 'user-register',
+    CREATE = 'user-create',
+    UPDATE = 'user-update',
+    BOUND = 'account-bound',
 }
 
 /**
@@ -41,6 +43,22 @@ export enum CaptchaDtoGroups {
 }
 
 /**
+ * 验证码操作类别
+ */
+export enum CaptchaActionType {
+    // 登录操作
+    LOGIN = 'login',
+    // 注册操作
+    REGISTER = 'register',
+    // 找回密码操作
+    RETRIEVEPASSWORD = 'retrieve-password',
+    // 重置密码操作
+    RESETPASSWORD = 'reset-password',
+    // 手机号或邮箱地址绑定操作
+    ACCOUNTBOUND = 'account-bound',
+}
+
+/**
  * 验证码类型
  */
 export enum CaptchaType {
@@ -62,23 +80,3 @@ export const SMS_CAPTCHA_JOB = 'sms-captcha-job';
  * 发送邮件验证码任务处理名称
  */
 export const EMAIL_CAPTCHA_JOB = 'mail-captcha-job';
-
-// src/modules/user/constants.ts
-
-/**
- * 用户列表查询排序方式
- */
-export enum UserOrderType {
-    CREATED = 'createdAt',
-    UPDATED = 'updatedAt',
-}
-
-/**
- * 用户请求DTO验证组
- */
-export enum UserDtoGroups {
-    REGISTER = 'user-register',
-    CREATE = 'user-create',
-    UPDATE = 'user-update',
-    BOUND = 'account-bound',
-}

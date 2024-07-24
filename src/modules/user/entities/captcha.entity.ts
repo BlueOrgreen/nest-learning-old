@@ -5,8 +5,12 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+
 import { CaptchaActionType, CaptchaType } from '../constants';
 
+/**
+ * 验证码模型
+ */
 @Entity('user_captchas')
 export class CaptchaEntity {
     @PrimaryGeneratedColumn('uuid')

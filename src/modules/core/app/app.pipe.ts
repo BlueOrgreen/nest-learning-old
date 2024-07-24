@@ -4,10 +4,7 @@ import merge from 'deepmerge';
 import { DTO_VALIDATION_OPTIONS } from '../constants';
 
 /**
- * @description 全局管道,用于处理DTO验证
- * @export
- * @class AppPipe
- * @extends {ValidationPipe}
+ * 全局管道,用于处理DTO验证
  */
 @Injectable()
 export class AppPipe extends ValidationPipe {
@@ -38,6 +35,7 @@ export class AppPipe extends ValidationPipe {
         this.validatorOptions = merge(this.validatorOptions, customOptions ?? {}, {
             arrayMerge: (_d, s, _o) => s,
         });
+
         // 序列化并验证dto对象
         let result = await super.transform(value, metadata);
         // 如果dto类的中存在transform静态方法,则返回调用进一步transform之后的结果

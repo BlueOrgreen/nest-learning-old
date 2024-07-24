@@ -3,6 +3,7 @@ import {
     BaseEntity,
     Column,
     CreateDateColumn,
+    DeleteDateColumn,
     Entity,
     JoinTable,
     ManyToMany,
@@ -12,11 +13,12 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import { UserEntity } from '@/modules/user/entities';
+
 import { PostBodyType } from '../constants';
 
 import { CategoryEntity } from './category.entity';
 import { CommentEntity } from './comment.entity';
-import { UserEntity } from '@/modules/user/entities/user.entity';
 
 /**
  * @description 文章模型
@@ -173,4 +175,14 @@ export class PostEntity extends BaseEntity {
         onUpdate: 'CASCADE',
     })
     author!: UserEntity;
+
+    @Expose()
+    @Type(() => Date)
+    @DeleteDateColumn({
+        comment: '删除时间',
+    })
+    deletedAt!: Date;
+
+    @Expose()
+    trashed!: boolean;
 }

@@ -1,30 +1,19 @@
-import { userConfig } from '@/config';
-import { get } from 'lodash';
 import bcrypt from 'bcrypt';
-import { DefaultUserConfig } from './types';
-import { CaptchaActionType, CaptchaType } from './constants';
+import { get } from 'lodash';
+
+import { userConfig } from '@/config';
+
 import { deepMerge } from '@/helpers';
 
-const defaultCaptchaTime = { limit: 60, expired: 60 * 30 };
-
-export const encrypt = (password: string) => {
-    return bcrypt.hashSync(password, userConfig().hash);
-};
-
-/**
- * 验证密码
- * @param password
- * @param hashed
- */
-export const decrypt = (password: string, hashed: string) => {
-    return bcrypt.compareSync(password, hashed);
-};
+import { CaptchaActionType, CaptchaType } from './constants';
+import { DefaultUserConfig } from './types';
 
 /**
  * 获取默认的验证码配置
  * @param type
  */
 const getDefaultCaptcha = (type: CaptchaType) => {
+    const defaultCaptchas = { limit: 60, expired: 60 * 30 };
     const subjects: { [key in CaptchaActionType]: string } = {
         register: '【用户注册】验证码',
         login: '【用户登录】验证码',
@@ -35,7 +24,9 @@ const getDefaultCaptcha = (type: CaptchaType) => {
     return Object.fromEntries(
         Object.values(CaptchaActionType).map((t) => [
             t,
-            type === CaptchaType.SMS ? {} : { subject: subjects[t] },
+            type === CaptchaType.SMS
+                ? defaultCaptchas
+                : { ...defaultCaptchas, subject: subjects[t] },
         ]),
     );
 };
@@ -44,23 +35,12 @@ const getDefaultCaptcha = (type: CaptchaType) => {
  * 默认用户配置
  */
 const defaultConfig: DefaultUserConfig = {
-    super: {
-        username: 'admin',
-        password: 'password',
-    },
     hash: 10,
     jwt: {
         token_expired: 3600,
         refresh_token_expired: 3600 * 30,
     },
     captcha: {
-        time: {
-            register: defaultCaptchaTime,
-            login: defaultCaptchaTime,
-            'retrieve-password': defaultCaptchaTime,
-            'reset-password': defaultCaptchaTime,
-            'account-bound': defaultCaptchaTime,
-        },
         sms: getDefaultCaptcha(CaptchaType.SMS) as any,
         email: getDefaultCaptcha(CaptchaType.EMAIL) as any,
     },
@@ -74,3 +54,27 @@ export function getUserConfig<T>(key?: string): T {
     const config = deepMerge(defaultConfig, userConfig(), 'merge');
     return key ? get(config, key) : config;
 }
+
+/**
+ * 生成随机验证码
+ */
+export function generateCatpchaCode() {
+    return Math.random().toFixed(6).slice(-6);
+}
+
+/**
+ * 加密明文密码
+ * @param password
+ */
+export const encrypt = (password: string) => {
+    return bcrypt.hashSync(password, userConfig().hash);
+};
+
+/**
+ * 验证密码
+ * @param password
+ * @param hashed
+ */
+export const decrypt = (password: string, hashed: string) => {
+    return bcrypt.compareSync(password, hashed);
+};
