@@ -6,6 +6,7 @@
 
 - basic-crud 基本crud框架
 - decorator-crud Crud装饰器
+- user 集成 OAuth2 用户鉴权、路由守卫功能的分支、消息队列 - 基本可参考这个分支进行扩展
 - main 所有代码
 
 ## 进度表
