@@ -7,11 +7,10 @@ import { v4 as uuid } from 'uuid';
 
 import { userConfig } from '@/config';
 
-// import { getTime } from '@/helpers';
+import { getTime } from '@/helpers';
 
 import { AccessTokenEntity, RefreshTokenEntity, UserEntity } from '../entities';
 import { JwtConfig, JwtPayload } from '../types';
-import { getTime } from '@/helpers';
 
 /**
  * 令牌服务
@@ -103,18 +102,16 @@ export class TokenService {
      */
     async removeAccessToken(value: string) {
         const accessToken = await AccessTokenEntity.findOne({
-            relations: ['refreshToken'],
             where: { value },
         });
         if (accessToken) await accessToken.remove();
-        await this.removeRefreshToken(accessToken.refreshToken.value);
     }
 
     /**
      * 移除RefreshToken
      * @param value
      */
-    protected async removeRefreshToken(value: string) {
+    async removeRefreshToken(value: string) {
         const refreshToken = await RefreshTokenEntity.findOne({
             where: { value },
             relations: ['accessToken'],
@@ -123,5 +120,15 @@ export class TokenService {
             if (refreshToken.accessToken) await refreshToken.accessToken.remove();
             await refreshToken.remove();
         }
+    }
+
+    /**
+     * 验证Token是否正确,如果正确则返回所属用户对象
+     * @param token
+     */
+    async verifyAccessToken(token: AccessTokenEntity) {
+        const result = jwt.verify(token.value, this.config.secret);
+        if (!result) return false;
+        return token.user;
     }
 }

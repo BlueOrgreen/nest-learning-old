@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, OneToOne } from 'typeorm';
 
 import { BaseToken } from './base.token';
-import { RefreshTokenEntity } from './refresh-token';
+import { RefreshTokenEntity } from './refresh-token.entity';
 import { UserEntity } from './user.entity';
 
 /**
@@ -19,7 +19,7 @@ export class AccessTokenEntity extends BaseToken {
     refreshToken!: RefreshTokenEntity;
 
     /**
-     * @description 所属用户所属用户所属用户
+     * @description 所属用户
      * @type {UserEntity}
      */
     @ManyToOne((type) => UserEntity, (user) => user.accessTokens, {

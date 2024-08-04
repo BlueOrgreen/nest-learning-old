@@ -21,12 +21,12 @@ type Condition = {
 /**
  * @description 在更新时验证唯一性,通过指定ignore忽略忽略的字段
  * @export
- * @class UniqueExistConstraint
+ * @class UniqueExistContraint
  * @implements {ValidatorConstraintInterface}
  */
 @ValidatorConstraint({ name: 'entityItemUniqueExist', async: true })
 @Injectable()
-export class UniqueExistConstraint implements ValidatorConstraintInterface {
+export class UniqueExistContraint implements ValidatorConstraintInterface {
     constructor(private dataSource: DataSource) {}
 
     async validate(value: any, args: ValidationArguments) {
@@ -81,7 +81,7 @@ export function IsUniqueExist(
             propertyName,
             options: validationOptions,
             constraints: [params],
-            validator: UniqueExistConstraint,
+            validator: UniqueExistContraint,
         });
     };
 }

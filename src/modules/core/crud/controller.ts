@@ -1,7 +1,9 @@
 import { Body, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { IPaginationMeta } from 'nestjs-typeorm-paginate';
 
-import { QueryListParams, PaginateDto, TrashedDto } from '../types';
+import { PaginateDto } from '@/helpers/types';
+
+import { QueryListParams, TrashedDto } from '../types';
 
 import { DeleteMultiDto } from './dtos/delete-multi.dto';
 import { DeleteDto } from './dtos/delete.dto';

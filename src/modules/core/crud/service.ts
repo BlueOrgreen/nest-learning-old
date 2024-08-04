@@ -3,9 +3,11 @@ import { isNil } from 'lodash';
 import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { IsNull, Not, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
-import { QueryTrashMode } from '../constants';
 import { manualPaginate } from '@/helpers';
-import { PaginateDto, QueryHook, QueryListParams, QueryParams } from '../types';
+import { PaginateDto } from '@/helpers/types';
+
+import { QueryTrashMode } from '../constants';
+import { QueryHook, QueryListParams, QueryParams } from '../types';
 
 import { BaseRepository } from './repository';
 import { BaseTreeRepository } from './tree.repository';
@@ -207,7 +209,7 @@ export abstract class BaseService<
     async restore(id: string, callback?: QueryHook<E>) {
         if (!this.enable_trash) {
             throw new ForbiddenException(
-                `Can not to restore ${this.repository.getQBName()}, because trash not enabled!`,
+                `Can not to retore ${this.repository.getQBName()},because trash not enabled!`,
             );
         }
         const item = await this.repository.findOneOrFail({

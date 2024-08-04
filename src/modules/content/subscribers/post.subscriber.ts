@@ -2,7 +2,7 @@ import { DataSource, EventSubscriber } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
 
-import { SubscriberSetting } from '@/modules/core/types';
+import { SubcriberSetting } from '@/modules/core/types';
 
 import { PostBodyType } from '../constants';
 import { PostEntity } from '../entities';
@@ -20,7 +20,7 @@ import { SanitizeService } from '../services';
 export class PostSubscriber extends BaseSubscriber<PostEntity> {
     protected entity = PostEntity;
 
-    protected setting: SubscriberSetting = {
+    protected setting: SubcriberSetting = {
         trash: true,
     };
 

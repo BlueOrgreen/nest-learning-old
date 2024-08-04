@@ -22,8 +22,7 @@ export class CommentService {
     ) {}
 
     async findTrees({ post }: { post?: string }) {
-        const res = await this.commentRepository.findTrees({ post });
-        return res;
+        return this.commentRepository.findTrees({ post });
     }
 
     /**
@@ -34,8 +33,6 @@ export class CommentService {
         const data = (await this.commentRepository.findRoots({ relations: ['post'] })).filter((c) =>
             !isNil(post) ? c.post.id === post : true,
         );
-        console.log(data);
-
         let comments: CommentEntity[] = [];
         for (let i = 0; i < data.length; i++) {
             const c = data[i];
@@ -73,7 +70,7 @@ export class CommentService {
      * @param ids
      * @param query
      */
-    async deleteMulti(ids: string[], query: QueryCommentDto) {
+    async deleteMullti(ids: string[], query: QueryCommentDto) {
         for (const id of ids) {
             await this.delete(id);
         }

@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
 
+import { tNumber } from '@/helpers';
+import { PaginateDto } from '@/helpers/types';
 import { QueryTrashMode } from '@/modules/core/constants';
 import { DtoValidation } from '@/modules/core/decorators';
-import { tNumber } from '@/helpers';
-import { PaginateDto, TrashedDto } from '@/modules/core/types';
+import { TrashedDto } from '@/modules/core/types';
 
 /**
  * 分类列表分页查询验证

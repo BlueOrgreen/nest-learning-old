@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, OneToOne } from 'typeorm';
 
-import { AccessTokenEntity } from './access-token';
+import { AccessTokenEntity } from './access-token.entity';
 import { BaseToken } from './base.token';
 
 /**

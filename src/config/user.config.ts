@@ -34,6 +34,9 @@ export const userConfig: () => UserConfig = () => ({
                 template: env('SMS_ACCOUNTBOUND_CAPTCHA_QCLOUD', 'your-id'),
             },
         },
-        email: {},
+        email: {
+            register: {},
+            'retrieve-password': {},
+        },
     },
 });

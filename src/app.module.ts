@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { database } from './config';
+import { database, queue, sms, smtp, redis } from './config';
 import { ContentModule } from './modules/content/content.module';
 import { CoreModule } from './modules/core/core.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
-    imports: [CoreModule.forRoot({ database: database() }), ContentModule, UserModule],
+    imports: [CoreModule.forRoot({ database, queue, sms, smtp, redis }), ContentModule, UserModule],
 })
 export class AppModule {}

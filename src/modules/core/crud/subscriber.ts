@@ -11,7 +11,7 @@ import {
     DataSource,
 } from 'typeorm';
 
-import { SubscriberSetting } from '../types';
+import { SubcriberSetting } from '../types';
 
 import { BaseRepository } from './repository';
 import { BaseTreeRepository } from './tree.repository';
@@ -66,9 +66,9 @@ export abstract class BaseSubscriber<E extends ObjectLiteral>
     /**
      * @description 一些相关的设置
      * @protected
-     * @type {SubscriberSetting}
+     * @type {SubcriberSetting}
      */
-    protected setting!: SubscriberSetting;
+    protected setting!: SubcriberSetting;
 
     constructor(dataSource: DataSource, repository?: SubscriberRepo<E>) {
         this.dataSource = dataSource;
@@ -98,10 +98,10 @@ export abstract class BaseSubscriber<E extends ObjectLiteral>
     /**
      * @description 判断某个属性是否被更新
      * @protected
-     * @param {keyof E} column
+     * @param {keyof E} cloumn
      * @param {UpdateEvent<E>} event
      */
-    protected isUpdated(column: keyof E, event: UpdateEvent<E>) {
-        return !!event.updatedColumns.find((item) => item.propertyName === column);
+    protected isUpdated(cloumn: keyof E, event: UpdateEvent<E>) {
+        return !!event.updatedColumns.find((item) => item.propertyName === cloumn);
     }
 }

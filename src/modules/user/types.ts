@@ -16,10 +16,6 @@ export interface UserConfig {
  * 默认用户模块配置
  */
 export interface DefaultUserConfig {
-    super: {
-        username: string;
-        password: string;
-    };
     hash: number;
     jwt: Pick<Required<JwtConfig>, 'token_expired' | 'refresh_token_expired'>;
     captcha: DefaultCaptchaConfig;
@@ -38,20 +34,9 @@ export interface CustomCaptchaConfig {
 }
 
 /**
- * 通用验证码选项
- */
-export interface CaptchaTimeOption {
-    limit: number; // 验证码发送间隔时间
-    expired: number; // 验证码有效时间
-}
-
-/**
  * 默认验证码配置
  */
 export interface DefaultCaptchaConfig {
-    time: {
-        [key in CaptchaActionType]: CaptchaTimeOption;
-    };
     [CaptchaType.SMS]: {
         [key in CaptchaActionType]: CaptchaOption;
     };

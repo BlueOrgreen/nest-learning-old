@@ -11,11 +11,12 @@ import {
     TreeRepositoryUtils,
 } from 'typeorm';
 
-import { OrderType } from '../constants';
-
 import { getOrderByQuery } from '@/helpers';
+import { OrderType } from '@/helpers/constants';
 
-import { OrderQueryType, TreeQueryParams } from '../types';
+import { OrderQueryType } from '@/helpers/types';
+
+import { TreeQueryParams } from '../types';
 
 export class BaseTreeRepository<E extends ObjectLiteral> extends TreeRepository<E> {
     /**
@@ -88,8 +89,6 @@ export class BaseTreeRepository<E extends ObjectLiteral> extends TreeRepository<
         let qb = this.getOrderByQuery(this.createQueryBuilder(this.qbName), orderBy);
         FindOptionsUtils.applyOptionsToTreeQueryBuilder(qb, pick(params, ['relations', 'depth']));
         qb.where(`${escapeAlias(this.qbName)}.${escapeColumn(parentPropertyName)} IS NULL`);
-        console.log('this.qbName', this.qbName);
-
         qb = addQuery ? addQuery(qb) : qb;
         if (withTrashed) qb.withDeleted();
         return qb.getMany();

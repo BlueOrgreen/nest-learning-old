@@ -1,4 +1,4 @@
-// import { isNil } from 'lodash';
+import { isNil } from 'lodash';
 import { SelectQueryBuilder } from 'typeorm';
 
 import { BaseTreeRepository } from '@/modules/core/crud';
@@ -24,9 +24,9 @@ export class CommentRepository extends BaseTreeRepository<CommentEntity> {
     ): Promise<CommentEntity[]> {
         return super.findTrees({
             ...params,
-            // addQuery: (qb) => {
-            //     return isNil(params.post) ? qb : qb.where('post.id = :id', { id: params.post });
-            // },
+            addQuery: (qb) => {
+                return isNil(params.post) ? qb : qb.where('post.id = :id', { id: params.post });
+            },
         });
     }
 }

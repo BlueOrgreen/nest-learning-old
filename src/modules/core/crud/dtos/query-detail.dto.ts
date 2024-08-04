@@ -3,6 +3,7 @@ import { Transform } from 'class-transformer';
 import { IsBoolean, IsOptional } from 'class-validator';
 
 import { tBoolean } from '@/helpers';
+
 /**
  * 详情查询
  */

@@ -12,6 +12,8 @@ import {
 
 import { OptionalUUIDPipe } from '@/modules/core/pipes';
 
+import { Guest } from '@/modules/user/decorators';
+
 import { CreateCommentDto, QueryCommentDto } from '../dtos';
 import { DeleteCommentMultiDto } from '../dtos/delete-comment-multi.dto';
 import { CommentService } from '../services';
@@ -26,6 +28,7 @@ import { CommentService } from '../services';
 export class CommentController {
     constructor(protected commentService: CommentService) {}
 
+    @Guest()
     @Get('tree/:post?')
     @SerializeOptions({})
     async index(@Param('post', new OptionalUUIDPipe()) post?: string) {
@@ -35,6 +38,7 @@ export class CommentController {
     /**
      * @description 显示评论树
      */
+    @Guest()
     @Get(':post?')
     @SerializeOptions({})
     async list(
@@ -67,6 +71,6 @@ export class CommentController {
         @Body()
         { items }: DeleteCommentMultiDto,
     ) {
-        return this.commentService.deleteMulti(items, query);
+        return this.commentService.deleteMullti(items, query);
     }
 }

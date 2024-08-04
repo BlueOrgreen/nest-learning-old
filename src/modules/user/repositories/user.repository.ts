@@ -7,9 +7,6 @@ import { UserEntity } from '../entities';
 export class UserRepository extends BaseRepository<UserEntity> {
     protected qbName = 'user';
 
-    /**
-     * 构建基础Query
-     */
     buildBaseQuery() {
         return this.createQueryBuilder(this.qbName).orderBy(`${this.qbName}.createdAt`, 'DESC');
     }

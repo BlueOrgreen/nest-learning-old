@@ -1,4 +1,4 @@
-import { OrderType } from '@/modules/core/constants';
+import { OrderType } from '@/helpers/constants';
 import { BaseTreeRepository } from '@/modules/core/crud';
 import { CustomRepository } from '@/modules/core/decorators';
 

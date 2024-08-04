@@ -1,12 +1,15 @@
 import path from 'path';
+
 import { Injectable } from '@nestjs/common';
 import Email from 'email-templates';
 import { pick } from 'lodash';
 import mailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import SMTPConnection from 'nodemailer/lib/smtp-connection';
-import { SmtpOptions, SmtpSendParams } from '../types';
+
 import { deepMerge } from '@/helpers';
+
+import { SmtpSendParams, SmtpOptions } from '../types';
 
 /**
  * SMTP邮件发送驱动

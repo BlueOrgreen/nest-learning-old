@@ -2,7 +2,7 @@ import { DataSource, EventSubscriber } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
 
-import { SubscriberSetting } from '@/modules/core/types';
+import { SubcriberSetting } from '@/modules/core/types';
 
 import { CategoryEntity } from '../entities';
 import { CategoryRepository } from '../repositories';
@@ -11,7 +11,7 @@ import { CategoryRepository } from '../repositories';
 export class CategorySubscriber extends BaseSubscriber<CategoryEntity> {
     protected entity = CategoryEntity;
 
-    protected setting: SubscriberSetting = {
+    protected setting: SubcriberSetting = {
         tree: true,
         trash: true,
     };

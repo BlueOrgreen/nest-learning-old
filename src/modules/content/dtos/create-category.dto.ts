@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, IsUUID, MaxLength, ValidateIf } from 'class-validator';
 
+import { tNumber } from '@/helpers';
 import { IsModelExist, IsTreeUnique, IsTreeUniqueExist } from '@/modules/core/constraints';
 import { DtoValidation } from '@/modules/core/decorators';
-
-import { tNumber } from '@/helpers';
 
 import { CategoryEntity } from '../entities';
 

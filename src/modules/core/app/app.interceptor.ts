@@ -6,10 +6,10 @@ import { isObject } from 'lodash';
 /**
  * @description 全局拦截器,用于序列化数据
  * @export
- * @class AppInterceptor
+ * @class AppIntercepter
  * @extends {ClassSerializerInterceptor}
  */
-export class AppInterceptor extends ClassSerializerInterceptor {
+export class AppIntercepter extends ClassSerializerInterceptor {
     serialize(
         response: PlainLiteralObject | Array<PlainLiteralObject>,
         options: ClassTransformOptions,
