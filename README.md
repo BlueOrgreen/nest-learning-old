@@ -55,6 +55,40 @@ if (Object.keys(condition).length > 0) {
 return query;
 ```
 
+```ts
+async checkAccessToken(value: string) {
+        return AccessTokenEntity.findOne({
+            where: { value },
+            relations: ['user', 'refreshToken'],
+        });
+    }
+```
+
+创建
+
+```ts
+ /**
+  * 创建用户
+  * @param data
+  */
+async create(data: CreateUserDto) {
+    const user = await this.userRepository.save(data);
+    return this.detail(user.id);
+}
+```
+
+更新
+```ts
+/**
+  * 更新用户
+  * @param data
+  */
+async update({ id, ...data }: UpdateUserDto) {
+    await this.userRepository.update(id, data);
+    return this.detail(id);
+}
+```
+
 
 ## Nestjs 应用  
 
