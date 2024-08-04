@@ -13,6 +13,8 @@ import {
 import { PostEntity } from '@/modules/content/entities';
 
 import { AccessTokenEntity } from './access-token.entity';
+import { MessageEntity } from './message.entity';
+import { MessagerecevieEntity } from './recevie.entity';
 
 /**
  * 用户模型
@@ -70,11 +72,6 @@ export class UserEntity extends BaseEntity {
     })
     accessTokens!: AccessTokenEntity[];
 
-    @OneToMany(() => PostEntity, (post) => post.author, {
-        cascade: true,
-    })
-    posts!: PostEntity[];
-
     @Expose({ groups: ['user-detail', 'user-list'] })
     @Expose()
     @Type(() => Date)
@@ -85,4 +82,17 @@ export class UserEntity extends BaseEntity {
 
     @Expose({ groups: ['user-detail', 'user-list'] })
     trashed!: boolean;
+
+    @OneToMany((type) => MessageEntity, (message) => message.sender, {
+        cascade: true,
+    })
+    sends!: MessageEntity[];
+
+    @OneToMany((type) => MessagerecevieEntity, (message) => message.recevier, { cascade: true })
+    messages!: MessagerecevieEntity[];
+
+    @OneToMany(() => PostEntity, (post) => post.author, {
+        cascade: true,
+    })
+    posts!: PostEntity[];
 }

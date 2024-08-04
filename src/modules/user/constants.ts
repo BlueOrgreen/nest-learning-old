@@ -80,3 +80,16 @@ export const SMS_CAPTCHA_JOB = 'sms-captcha-job';
  * 发送邮件验证码任务处理名称
  */
 export const EMAIL_CAPTCHA_JOB = 'mail-captcha-job';
+
+/**
+ * 保存消息队列名称
+ */
+export const SAVE_MESSAGE_QUEUE = 'send-message-queue';
+
+/**
+ * 消息接收者操作类型
+ */
+export enum RecevierActionType {
+    READED = 'readed',
+    DELETE = 'delete',
+}
