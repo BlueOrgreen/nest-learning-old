@@ -11,6 +11,8 @@ import {
     TreeParent,
 } from 'typeorm';
 
+import { UserEntity } from '@/modules/user/entities';
+
 import { PostEntity } from './post.entity';
 
 /**
@@ -44,6 +46,14 @@ export class CommentEntity extends BaseEntity {
         onUpdate: 'CASCADE',
     })
     post!: PostEntity;
+
+    @Expose()
+    @ManyToOne((type) => UserEntity, (user) => user.comments, {
+        nullable: false,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    })
+    user!: UserEntity;
 
     /**
      * @description 子评论

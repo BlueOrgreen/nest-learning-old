@@ -7,6 +7,7 @@ import { UserModule } from '../user/user.module';
 import * as ControllerMaps from './controllers';
 import * as DtoMaps from './dtos';
 import * as EntityMaps from './entities';
+import { ContentRbac } from './rbac';
 import * as RepositoryMaps from './repositories';
 import * as ServerMaps from './services';
 import * as SubscriberMaps from './subscribers';
@@ -25,7 +26,7 @@ const controllers = Object.values(ControllerMaps);
         CoreModule.forRepository(repositories),
     ],
     controllers,
-    providers: [...subscribers, ...dtos, ...services],
+    providers: [...subscribers, ...dtos, ...services, ContentRbac],
     exports: [
         // 导出自定义Repository,以供其它模块使用
         CoreModule.forRepository(repositories),

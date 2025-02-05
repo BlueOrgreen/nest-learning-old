@@ -5,18 +5,29 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-import { PostEntity } from '@/modules/content/entities';
+import { CommentEntity, PostEntity } from '@/modules/content/entities';
+import { AddRelations } from '@/modules/core/decorators';
+
+import { DynamicRelation } from '@/modules/core/types';
+
+import { PermissionEntity, RoleEntity } from '@/modules/rbac/entities';
+
+import { getUserConfig } from '../helpers';
 
 import { AccessTokenEntity } from './access-token.entity';
+import { MessageEntity } from './message.entity';
+import { MessagerecevieEntity } from './recevie.entity';
 
 /**
  * 用户模型
  */
+@AddRelations(() => getUserConfig<DynamicRelation[]>('relations'))
 @Exclude()
 @Entity('users')
 export class UserEntity extends BaseEntity {
@@ -81,16 +92,31 @@ export class UserEntity extends BaseEntity {
     @Expose({ groups: ['user-detail', 'user-list'] })
     trashed!: boolean;
 
-    // @OneToMany((type) => MessageEntity, (message) => message.sender, {
-    //     cascade: true,
-    // })
-    // sends!: MessageEntity[];
+    @OneToMany((type) => MessageEntity, (message) => message.sender, {
+        cascade: true,
+    })
+    sends!: MessageEntity[];
 
-    // @OneToMany((type) => MessagerecevieEntity, (message) => message.recevier, { cascade: true })
-    // messages!: MessagerecevieEntity[];
+    @OneToMany((type) => MessagerecevieEntity, (message) => message.recevier, { cascade: true })
+    messages!: MessagerecevieEntity[];
 
     @OneToMany(() => PostEntity, (post) => post.author, {
         cascade: true,
     })
     posts!: PostEntity[];
+
+    @OneToMany(() => CommentEntity, (comment) => comment.user, {
+        cascade: true,
+    })
+    comments!: CommentEntity[];
+
+    @Expose()
+    @ManyToMany(() => RoleEntity, (role) => role.users, { cascade: true })
+    roles!: RoleEntity[];
+
+    @Expose()
+    @ManyToMany(() => PermissionEntity, (permisson) => permisson.users, {
+        cascade: true,
+    })
+    permissions!: PermissionEntity[];
 }

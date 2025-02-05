@@ -84,7 +84,7 @@ export const EMAIL_CAPTCHA_JOB = 'mail-captcha-job';
 /**
  * 保存消息队列名称
  */
-export const SAVE_MESSAGE_QUEUE = 'send-message-queue';
+export const SAVE_MESSAGE_QUEUE = 'save-message-queue';
 
 /**
  * 消息接收者操作类型

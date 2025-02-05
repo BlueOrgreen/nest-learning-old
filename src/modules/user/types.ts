@@ -1,24 +1,34 @@
-import { RecordNever } from '../core/types';
+import { ClassToPlain, DynamicRelation, RecordNever } from '../core/types';
 
 import { CaptchaActionType, CaptchaType } from './constants';
-import { CaptchaEntity } from './entities';
+import { CaptchaEntity, MessageEntity } from './entities';
 
 /**
  * 自定义用户模块配置
  */
 export interface UserConfig {
+    super: {
+        username: string;
+        password: string;
+    };
     hash?: number;
     jwt: JwtConfig;
     captcha?: CustomCaptchaConfig;
+    relations?: DynamicRelation[];
 }
 
 /**
  * 默认用户模块配置
  */
 export interface DefaultUserConfig {
+    super: {
+        username: string;
+        password: string;
+    };
     hash: number;
     jwt: Pick<Required<JwtConfig>, 'token_expired' | 'refresh_token_expired'>;
     captcha: DefaultCaptchaConfig;
+    relations: DynamicRelation[];
 }
 
 /**
@@ -101,4 +111,13 @@ export interface SendCaptchaQueueJob {
 export type CaptchaValidate<T extends Record<string, any> = RecordNever> = T & {
     value: string;
     code: string;
+};
+
+/**
+ * 用于队列存储消息的数据类型
+ * 异步存储消息的数据类型
+ */
+export type SaveMessageQueueJob = Pick<ClassToPlain<MessageEntity>, 'title' | 'body' | 'type'> & {
+    receviers: string[];
+    sender: string;
 };
