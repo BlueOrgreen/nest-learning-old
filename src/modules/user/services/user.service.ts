@@ -27,20 +27,20 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
     }
 
     async init() {
-        const old = await this.findOneByCredential('pincman');
+        const old = await this.findOneByCredential('yunfan');
         if (!isNil(old)) {
             const admin = await this.update({
                 id: old.id,
-                username: 'pincman',
+                username: 'yunfan',
                 password: '123456aA$',
-                email: 'pincman@qq.com',
+                email: 'yunfan@qq.com',
             });
             return admin;
         }
         return this.create({
-            username: 'pincman',
+            username: 'yunfan',
             password: '123456aA$',
-            email: 'pincman@qq.com',
+            email: 'yunfan@qq.com',
         } as unknown as CreateUserDto);
     }
 
