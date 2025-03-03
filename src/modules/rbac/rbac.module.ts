@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 
+import { APP_GUARD } from '@nestjs/core';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -11,6 +12,7 @@ import { UserModule } from '../user/user.module';
 
 import * as controllerMaps from './controllers';
 import * as EntityMaps from './entities';
+import { RbacGuard } from './guards';
 import * as RepositoryMaps from './repositories';
 import { RbacResolver } from './resolver';
 import * as serviceMaps from './services';
@@ -27,6 +29,10 @@ const services = Object.values(serviceMaps);
     ],
     providers: [
         ...services,
+        {
+            provide: APP_GUARD,
+            useClass: RbacGuard,
+        },
         {
             provide: RbacResolver,
             useFactory: async (dataSource: DataSource) => {

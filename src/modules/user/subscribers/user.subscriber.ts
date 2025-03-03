@@ -6,6 +6,8 @@ import { BaseSubscriber } from '@/modules/core/crud';
 
 import { SubcriberSetting } from '@/modules/core/types';
 
+import { PermissionEntity, RoleEntity } from '@/modules/rbac/entities';
+
 import { UserEntity } from '../entities/user.entity';
 import { encrypt } from '../helpers';
 import { UserRepository } from '../repositories';
@@ -67,5 +69,20 @@ export class UserSubscriber extends BaseSubscriber<UserEntity> {
 
     protected isUpdated<E>(cloumn: keyof E, event: UpdateEvent<E>): any {
         return event.updatedColumns.find((item) => item.propertyName === cloumn);
+    }
+
+    async afterLoad(entity: UserEntity): Promise<void> {
+        let permissions = (entity.permissions ?? []) as PermissionEntity[];
+        for (const role of entity.roles ?? []) {
+            const roleEntity = await RoleEntity.findOneOrFail({
+                relations: ['permissions'],
+                where: { id: role.id },
+            });
+            permissions = [...permissions, ...(roleEntity.permissions ?? [])];
+        }
+        entity.permissions = permissions.reduce((o, n) => {
+            if (o.find(({ name }) => name === n.name)) return o;
+            return [...o, n];
+        }, []);
     }
 }
