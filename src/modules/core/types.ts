@@ -6,7 +6,15 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ClassTransformOptions } from 'class-transformer';
 import Email from 'email-templates';
 import { Attachment } from 'nodemailer/lib/mailer';
-import { FindTreeOptions, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import {
+    FindTreeOptions,
+    ObjectLiteral,
+    SelectQueryBuilder,
+    ManyToMany,
+    OneToOne,
+    OneToMany,
+    ManyToOne,
+} from 'typeorm';
 
 import { OrderQueryType, QueueOptions, RedisOptions } from '@/helpers/types';
 
@@ -195,6 +203,7 @@ export interface CrudMethodOption {
      * 序列化选项,如果为`noGroup`则不传参数，否则根据`id`+方法匹配来传参
      */
     serialize?: ClassTransformOptions | 'noGroup';
+    hook?: (target: Type<any>, method: string) => void;
 }
 /**
  * 每个启用方法的配置
@@ -215,4 +224,19 @@ export interface CurdOptions {
     dtos: {
         [key in 'query' | 'create' | 'update']?: Type<any>;
     };
+}
+
+/**
+ * @description 动态关联接口
+ * @export
+ * @interface DynamicRelation
+ */
+export interface DynamicRelation {
+    relation:
+        | ReturnType<typeof OneToOne>
+        | ReturnType<typeof OneToMany>
+        | ReturnType<typeof ManyToOne>
+        | ReturnType<typeof ManyToMany>;
+    others?: Array<(...args: any) => any>;
+    column: string;
 }

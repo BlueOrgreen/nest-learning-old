@@ -1,16 +1,20 @@
 import { BullModule } from '@nestjs/bullmq';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
-import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { loadEntities } from '@/helpers';
 
 import { CoreModule } from '../core/core.module';
 
-import { SEND_CAPTCHA_QUEUE } from './constants';
+import { RbacModule } from '../rbac/rbac.module';
+
+import { SEND_CAPTCHA_QUEUE, SAVE_MESSAGE_QUEUE } from './constants';
 
 import * as controllerMaps from './controllers';
 import * as dtoMaps from './dtos';
 import * as entityMaps from './entities';
+import { MessageGateWay } from './gateways/ws.gateway';
 import * as guardMaps from './guards';
 import { JwtAuthGuard } from './guards';
 import * as queueMaps from './queue';
@@ -30,13 +34,19 @@ const controllers = Object.values(controllerMaps);
 const queue = Object.values(queueMaps);
 @Module({
     imports: [
-        TypeOrmModule.forFeature(entities),
+        loadEntities(entities),
+        // TypeOrmModule.forFeature(entities),
         CoreModule.forRepository(repositories),
         PassportModule,
         serviceMaps.AuthService.jwtModuleFactory(),
         BullModule.registerQueue({
             name: SEND_CAPTCHA_QUEUE,
         }),
+        // 注册队列
+        BullModule.registerQueue({
+            name: SAVE_MESSAGE_QUEUE,
+        }),
+        forwardRef(() => RbacModule),
     ],
     providers: [
         ...strategies,
@@ -49,6 +59,7 @@ const queue = Object.values(queueMaps);
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
         },
+        MessageGateWay,
     ],
     controllers,
     exports: [...services, ...queue, CoreModule.forRepository(repositories)],

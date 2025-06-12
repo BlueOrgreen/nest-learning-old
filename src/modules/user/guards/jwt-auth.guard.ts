@@ -14,7 +14,7 @@ import { TokenService } from '../services';
  */
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-    constructor(private reflector: Reflector, private readonly tokenService: TokenService) {
+    constructor(protected reflector: Reflector, protected readonly tokenService: TokenService) {
         super();
     }
 

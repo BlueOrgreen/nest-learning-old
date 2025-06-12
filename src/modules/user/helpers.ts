@@ -35,6 +35,10 @@ const getDefaultCaptcha = (type: CaptchaType) => {
  * 默认用户配置
  */
 const defaultConfig: DefaultUserConfig = {
+    super: {
+        username: 'admin',
+        password: 'password',
+    },
     hash: 10,
     jwt: {
         token_expired: 3600,
@@ -44,6 +48,7 @@ const defaultConfig: DefaultUserConfig = {
         sms: getDefaultCaptcha(CaptchaType.SMS) as any,
         email: getDefaultCaptcha(CaptchaType.EMAIL) as any,
     },
+    relations: [],
 };
 
 /**

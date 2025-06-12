@@ -21,6 +21,7 @@
         "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
+        "@casl/ability": "6.2.0",
         "@nestjs/bullmq": "^0.1.1",
         "@nestjs/common": "^9.0.11",
         "@nestjs/core": "^9.0.11",
@@ -28,8 +29,10 @@
         "@nestjs/passport": "^9.0.0",
         "@nestjs/platform-express": "^9.0.11",
         "@nestjs/platform-fastify": "9.0.11",
+        "@nestjs/platform-ws": "9.0.11",
         "@nestjs/swagger": "^6.0.5",
         "@nestjs/typeorm": "^9.0.1",
+        "@nestjs/websockets": "9.0.11",
         "@types/jsonwebtoken": "^8.5.8",
         "@types/uuid": "^8.3.4",
         "bcrypt": "^5.0.1",
@@ -61,7 +64,8 @@
         "tencentcloud-sdk-nodejs": "^4.0.890",
         "typeorm": "^0.3.7",
         "uuid": "^8.3.2",
-        "validator": "^13.7.0"
+        "validator": "^13.7.0",
+        "ws": "8.8.1"
     },
     "devDependencies": {
         "@nestjs/cli": "^9.0.0",
@@ -79,6 +83,7 @@
         "@types/sanitize-html": "^2.6.2",
         "@types/supertest": "^2.0.12",
         "@types/validator": "^13.7.5",
+        "@types/ws": "8.5.3",
         "@typescript-eslint/eslint-plugin": "^5.33.1",
         "@typescript-eslint/parser": "^5.33.1",
         "cross-env": "^7.0.3",

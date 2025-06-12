@@ -1,5 +1,8 @@
+import { OneToMany } from 'typeorm';
+
 import { env, getRunEnv } from '@/helpers';
 import { EnvironmentType } from '@/helpers/constants';
+import { CommentEntity, PostEntity } from '@/modules/content/entities';
 import { UserConfig } from '@/modules/user/types';
 
 const expiredTime = getRunEnv() === EnvironmentType.DEVELOPMENT ? 3600 * 10000 : 3600;
@@ -39,4 +42,26 @@ export const userConfig: () => UserConfig = () => ({
             'retrieve-password': {},
         },
     },
+    relations: [
+        {
+            column: 'posts',
+            relation: OneToMany(
+                () => PostEntity,
+                (post) => post.author,
+                {
+                    cascade: true,
+                },
+            ),
+        },
+        {
+            column: 'comment',
+            relation: OneToMany(
+                () => CommentEntity,
+                (comment) => comment.user,
+                {
+                    cascade: true,
+                },
+            ),
+        },
+    ],
 });

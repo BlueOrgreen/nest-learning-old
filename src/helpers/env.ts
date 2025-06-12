@@ -117,17 +117,17 @@ export function loadEnvs() {
         process.env.NODE_ENV = EnvironmentType.PRODUCTION;
     }
     const search = [findUp.sync(['.env'])];
-    console.log(process.env.NODE_ENV);
+    // console.log(process.env.NODE_ENV);
 
     if (process.env.NODE_ENV !== EnvironmentType.PRODUCTION) {
         search.push(findUp.sync([`.env.${process.env.NODE_ENV}`]));
     }
-    console.log('search===>', search);
+    // console.log('search===>', search);
     const envFiles = search.filter((file) => file !== undefined) as string[];
-    console.log(
-        'dovenv===>',
-        envFiles.map((itemPath) => dotenv.parse(fs.readFileSync(itemPath))),
-    );
+    // console.log(
+    //     'dovenv===>',
+    //     envFiles.map((itemPath) => dotenv.parse(fs.readFileSync(itemPath))),
+    // );
 
     // 所有文件中配置的环境变量
     const fileEnvs = envFiles

@@ -23,3 +23,5 @@ export const CRUD_OPTIONS = 'crud_options';
  * 允许游客访问的装饰器常量
  */
 export const ALLOW_GUEST = 'allowGuest';
+
+export const ADDTIONAL_RELATIONS = 'additional_relations';

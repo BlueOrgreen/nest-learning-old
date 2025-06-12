@@ -14,6 +14,7 @@ import { UserService } from '../services/user.service';
     id: 'user',
     enabled: [
         'list',
+        // { name: 'list', option: { allowGuest: true } },
         { name: 'detail', option: { allowGuest: true } },
         'store',
         'update',
