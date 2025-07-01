@@ -1,14 +1,18 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { isNil } from 'lodash';
+import { isArray, isNil, omit } from 'lodash';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 import { BaseService } from '@/modules/core/crud';
 import { ClassToPlain, QueryHook } from '@/modules/core/types';
 
-import { CreateUserDto, QueryUserDto, UpdatePassword, UpdateUserDto } from '../dtos';
+import { CreateUserDto, QueryUserDto, UpdatePassword } from '../dtos';
 import { UserEntity } from '../entities';
 import { UserRepository } from '../repositories';
+import { getUserConfig } from '../helpers';
+import { UserConfig } from '../types';
+import { RoleRepository } from '@/modules/rbac/repositories';
+import { SystemRoles } from '@/modules/rbac/constants';
 
 // 用户查询接口
 type FindParams = {
@@ -22,8 +26,24 @@ type FindParams = {
 export class UserService extends BaseService<UserEntity, UserRepository> {
     protected enable_trash = true;
 
-    constructor(protected readonly userRepository: UserRepository) {
+    constructor(
+        protected readonly userRepository: UserRepository,
+        protected roleRepository: RoleRepository,
+    ) {
         super(userRepository);
+    }
+
+    async onModuleInit() {
+        const adminConf = getUserConfig<UserConfig['super']>('super');
+        const admin = await this.findOneByCredential(adminConf.username);
+        if (!isNil(admin)) {
+            if (!admin.isFirst) {
+                await UserEntity.save({ id: admin.id, isFirst: true });
+                return this.findOneByCredential(adminConf.username);
+            }
+            return admin;
+        }
+        return this.create({ ...adminConf, isFirst: true } as any);
     }
 
     async init() {
@@ -48,8 +68,32 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
      * 创建用户
      * @param data
      */
-    async create(data: CreateUserDto) {
-        const user = await this.userRepository.save(data);
+    // async create(data: CreateUserDto) {
+    //     const user = await this.userRepository.save(data);
+    //     return this.detail(user.id);
+    // }
+
+    /**
+     * 创建用户
+     * @param data
+     */
+    async create({ roles, permissions, ...data }: CreateUserDto) {
+        const user = await this.userRepository.save(omit(data, ['isFirst']), { reload: true });
+        if (isArray(roles) && roles.length > 0) {
+            await this.userRepository
+                .createQueryBuilder('user')
+                .relation('roles')
+                .of(user)
+                .add(roles);
+        }
+        if (isArray(permissions) && permissions.length > 0) {
+            await this.userRepository
+                .createQueryBuilder('user')
+                .relation('permissions')
+                .of(user)
+                .add(permissions);
+        }
+        await this.syncActived(await this.detail(user.id));
         return this.detail(user.id);
     }
 
@@ -57,10 +101,10 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
      * 更新用户
      * @param data
      */
-    async update(data: UpdateUserDto) {
-        const user = await this.userRepository.save(data);
-        return this.detail(user.id);
-    }
+    // async update(data: UpdateUserDto) {
+    //     const user = await this.userRepository.save(data);
+    //     return this.detail(user.id);
+    // }
 
     /**
      * 更新用户密码
@@ -145,5 +189,44 @@ export class UserService extends BaseService<UserEntity, UserRepository> {
             query = query.where(condition);
         }
         return query;
+    }
+
+    /**
+     * 根据用户的actived字段同步角色和权限
+     * @param user
+     */
+    protected async syncActived(user: UserEntity) {
+        const roleRelation = this.userRepository.createQueryBuilder().relation('roles').of(user);
+        const permissionRelation = this.userRepository
+            .createQueryBuilder()
+            .relation('permissions')
+            .of(user);
+        if (user.actived) {
+            const roleNames = (user.roles ?? []).map(({ name }) => name);
+            const noRoles =
+                roleNames.length <= 0 ||
+                (!roleNames.includes(SystemRoles.USER) && !roleNames.includes(SystemRoles.ADMIN));
+            const isSuperAdmin = roleNames.includes(SystemRoles.ADMIN);
+
+            // 为普通用户添加custom-user角色
+            // 为超级管理员添加super-admin角色
+            if (noRoles) {
+                const customRole = await this.roleRepository.findOne({
+                    relations: ['users'],
+                    where: { name: SystemRoles.USER },
+                });
+                if (!isNil(customRole)) await roleRelation.add(customRole);
+            } else if (isSuperAdmin) {
+                const adminRole = await this.roleRepository.findOne({
+                    relations: ['users'],
+                    where: { name: SystemRoles.ADMIN },
+                });
+                if (!isNil(adminRole)) await roleRelation.addAndRemove(adminRole, user.roles);
+            }
+        } else {
+            // 清空禁用用户的角色和权限
+            await roleRelation.remove((user.roles ?? []).map(({ id }) => id));
+            await permissionRelation.remove((user.permissions ?? []).map(({ id }) => id));
+        }
     }
 }

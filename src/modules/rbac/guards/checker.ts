@@ -20,6 +20,8 @@ type CheckerParams = {
     request?: any;
 };
 
+// getCheckers 从控制器方法或类上读取装饰器 PERMISSION_CHECKERS，获取一组自定义的校验器函数。
+// 如果控制器/方法没定义权限校验器，那说明这个路由默认放行。
 // - getCheckers用于通过 PERMISSION_CHECKERS 的装饰器元数据获取控制器方法上的权限验证器
 export const getCheckers = (context: ExecutionContext, reflector: Reflector) => {
     const crudCheckers = Reflect.getMetadata(
@@ -51,6 +53,8 @@ export const solveChecker = async ({
         if (o.find(({ name }) => name === n.name)) return o;
         return [...o, n];
     }, []);
+    // 将权限规则转成 CASL 的能力定义格式 Ability<[action, subject]>，比如：
+    // { action: 'read', subject: 'Article', conditions: {...} }
     const ability = createMongoAbility(
         permissions.map(({ rule, name }) => {
             const resolve = resolver.permissions.find((p) => p.name === name);

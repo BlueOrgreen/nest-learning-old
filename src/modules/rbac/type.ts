@@ -39,6 +39,7 @@ export interface RbacCurdItem {
     name: CurdMethod;
     option?: RbacCurdOption;
 }
+
 export type RbacCurdOptions = Omit<CurdOptions, 'enabled'> & {
     enabled: Array<CurdMethod | RbacCurdItem>;
 };

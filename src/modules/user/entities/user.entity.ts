@@ -11,7 +11,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import { CommentEntity, PostEntity } from '@/modules/content/entities';
+// import { CommentEntity, PostEntity } from '@/modules/content/entities';
 import { AddRelations } from '@/modules/core/decorators';
 
 import { DynamicRelation } from '@/modules/core/types';
@@ -31,6 +31,8 @@ import { MessagerecevieEntity } from './recevie.entity';
 @Exclude()
 @Entity('users')
 export class UserEntity extends BaseEntity {
+    [key: string]: any;
+
     @Expose()
     @PrimaryGeneratedColumn('uuid')
     id!: string;
@@ -59,6 +61,10 @@ export class UserEntity extends BaseEntity {
 
     @Column({ comment: '用户状态,是否激活', default: true })
     actived?: boolean;
+
+    @Expose()
+    @Column({ comment: '是否是第一个用户', default: false })
+    isFirst?: boolean;
 
     @Expose({ groups: ['user-detail', 'user-list'] })
     @Expose()
@@ -100,15 +106,15 @@ export class UserEntity extends BaseEntity {
     @OneToMany((type) => MessagerecevieEntity, (message) => message.recevier, { cascade: true })
     messages!: MessagerecevieEntity[];
 
-    @OneToMany(() => PostEntity, (post) => post.author, {
-        cascade: true,
-    })
-    posts!: PostEntity[];
+    // @OneToMany(() => PostEntity, (post) => post.author, {
+    //     cascade: true,
+    // })
+    // posts!: PostEntity[];
 
-    @OneToMany(() => CommentEntity, (comment) => comment.user, {
-        cascade: true,
-    })
-    comments!: CommentEntity[];
+    // @OneToMany(() => CommentEntity, (comment) => comment.user, {
+    //     cascade: true,
+    // })
+    // comments!: CommentEntity[];
 
     @Expose()
     @ManyToMany(() => RoleEntity, (role) => role.users, { cascade: true })

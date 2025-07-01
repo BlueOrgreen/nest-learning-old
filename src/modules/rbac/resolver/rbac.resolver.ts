@@ -93,6 +93,7 @@ export class RbacResolver<A extends AbilityTuple = AbilityTuple, C extends Mongo
         try {
             await this.syncRoles(queryRunner.manager);
             await this.syncPermissions(queryRunner.manager);
+            await queryRunner.commitTransaction();
         } catch (err) {
             console.log(err);
             await queryRunner.rollbackTransaction();
@@ -112,6 +113,7 @@ export class RbacResolver<A extends AbilityTuple = AbilityTuple, C extends Mongo
             }
             return [...o, n];
         }, []);
+
         for (const item of this.roles) {
             let role = await manager.findOne(RoleEntity, {
                 relations: ['permissions'],
@@ -119,8 +121,11 @@ export class RbacResolver<A extends AbilityTuple = AbilityTuple, C extends Mongo
                     name: item.name,
                 },
             });
+            // console.log('syncRoles ===role ===>', role, item.name);
 
             if (isNil(role)) {
+                console.log('YUnfan');
+
                 role = await manager.save(
                     manager.create(RoleEntity, {
                         name: item.name,

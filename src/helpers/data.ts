@@ -74,8 +74,6 @@ export const loadEntities = (
     entities: EntityClassOrSchema[] = [],
     dataSource?: DataSource | DataSourceOptions | string,
 ) => {
-    console.log('entities', entities);
-
     const es = entities.map((e) => {
         // 动态关联实现逻辑为读取ADDTIONAL_RELATIONS常量，
         // 通过该常量存储的值来添加关联的column字段与关联关系，
@@ -84,7 +82,7 @@ export const loadEntities = (
 
         if ('prototype' in e && relationsRegister && typeof relationsRegister === 'function') {
             const relations: DynamicRelation[] = relationsRegister();
-            console.log('relations===>', relations, e);
+
             relations.forEach(({ column, relation }) => {
                 const cProperty = Object.getOwnPropertyDescriptor(e.prototype, column);
                 if (!cProperty) {

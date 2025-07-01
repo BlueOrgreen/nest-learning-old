@@ -187,3 +187,71 @@ export class AuthService {
 
 **5.应用销毁**
 - 调用 `app.close()` 时触发清理资源和连接
+
+
+## 什么时候需要用事务 来填充数据
+
+本仓库 使用事务来进行角色权限数据录入 的代码
+
+```tsx
+@Injectable()
+export class RbacResolver<A extends AbilityTuple = AbilityTuple, C extends MongoQuery = MongoQuery>
+    implements OnApplicationBootstrap
+{
+
+  async onApplicationBootstrap() {
+        const queryRunner = this.dataSource.createQueryRunner();
+
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            await this.syncRoles(queryRunner.manager);
+            await this.syncPermissions(queryRunner.manager);
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            console.log(err);
+            await queryRunner.rollbackTransaction();
+        } finally {
+            await queryRunner.release();
+        }
+    }
+}
+```
+
+
+### ✅ 什么时候需要手动事务（QueryRunner）
+
+
+| 场景                               | 是否需要事务    |
+| -------------------------------- | --------- |
+| 插入/更新多个表的数据，要求 **要么全部成功，要么全部失败** | ✅ 是，需要事务  |
+| 对数据库的多个操作之间有强依赖性                 | ✅ 是，需要事务  |
+| 实现某些业务逻辑时要确保中间状态不被外界读取（如转账）      | ✅ 是，需要事务  |
+| 单表插入/更新，无依赖                      | ❌ 否，不需要事务 |
+| 启动时同步权限/角色，且希望“同步完整失败就全退回”       | ✅ 是，推荐事务  |
+
+
+### ✅ 什么时候不需要手动事务
+
+如果你只是：
+
+简单执行 `repository.save()`
+
+或 `manager.save()` / `update()` / `remove()` 等单个操作
+
+并且不需要多个数据库操作保持一致性
+
+👉 那么 `TypeORM` 会自动提交这些操作，不需要你手动开启事务
+
+```tsx
+await this.roleRepository.save({ name: 'admin', ... });
+```
+
+
+### 🚀 实战建议
+
+- 平时后台管理系统的数据录入、更新接口，一般不需要事务。
+
+- 初始化数据（像你现在的权限系统角色）、批量导入、复杂的业务处理等场景，建议用事务，避免中间状态污染数据。
+

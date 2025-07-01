@@ -1,6 +1,6 @@
 import { BullModule } from '@nestjs/bullmq';
 import { forwardRef, Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+// import { APP_GUARD } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
 
 import { loadEntities } from '@/helpers';
@@ -16,7 +16,7 @@ import * as dtoMaps from './dtos';
 import * as entityMaps from './entities';
 import { MessageGateWay } from './gateways/ws.gateway';
 import * as guardMaps from './guards';
-import { JwtAuthGuard } from './guards';
+// import { JwtAuthGuard } from './guards';
 import * as queueMaps from './queue';
 import * as RepositoryMaps from './repositories';
 import * as serviceMaps from './services';
@@ -55,10 +55,10 @@ const queue = Object.values(queueMaps);
         ...guards,
         ...subscribers,
         ...queue,
-        {
-            provide: APP_GUARD,
-            useClass: JwtAuthGuard,
-        },
+        // {
+        //     provide: APP_GUARD,
+        //     useClass: JwtAuthGuard,
+        // },
         MessageGateWay,
     ],
     controllers,

@@ -24,4 +24,7 @@ export const CRUD_OPTIONS = 'crud_options';
  */
 export const ALLOW_GUEST = 'allowGuest';
 
+/**
+ * 添加一个动态关联装饰器，用于存储关联关系
+ */
 export const ADDTIONAL_RELATIONS = 'additional_relations';

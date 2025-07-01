@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CoreModule } from '../core/core.module';
+import { RbacModule } from '../rbac/rbac.module';
 import { UserModule } from '../user/user.module';
 
 import * as ControllerMaps from './controllers';
@@ -21,6 +22,7 @@ const controllers = Object.values(ControllerMaps);
 @Module({
     imports: [
         UserModule,
+        RbacModule,
         TypeOrmModule.forFeature(entities),
         // 注册自定义Repository
         CoreModule.forRepository(repositories),

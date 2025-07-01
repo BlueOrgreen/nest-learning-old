@@ -1,11 +1,11 @@
 import { isNil } from 'lodash';
-
-import { EventSubscriber } from 'typeorm';
+import { DataSource, EventSubscriber } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
 import { SubcriberSetting } from '@/modules/core/types';
 
-import { RoleEntity } from '../entities/role.entity';
+import { RoleEntity } from '../entities';
+import { RoleRepository } from '../repositories';
 
 @EventSubscriber()
 export class RoleSubscriber extends BaseSubscriber<RoleEntity> {
@@ -14,6 +14,10 @@ export class RoleSubscriber extends BaseSubscriber<RoleEntity> {
     protected setting: SubcriberSetting = {
         trash: true,
     };
+
+    constructor(protected dataSource: DataSource, protected roleRepository: RoleRepository) {
+        super(dataSource, roleRepository);
+    }
 
     async afterLoad(entity: RoleEntity) {
         if (isNil(entity.label)) {

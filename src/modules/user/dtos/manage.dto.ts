@@ -9,6 +9,8 @@ import { DtoValidation } from '@/modules/core/decorators';
 import { UserDtoGroups, UserOrderType } from '../constants';
 
 import { GuestDto } from './guest.dto';
+import { IsModelExist } from '@/modules/core/constraints';
+import { PermissionEntity, RoleEntity } from '@/modules/rbac/entities';
 
 /**
  * 创建用的请求数据验证
@@ -24,6 +26,32 @@ export class CreateUserDto extends PickType(GuestDto, [
     @IsBoolean({ always: true, message: 'actived必须为布尔值' })
     @IsOptional({ always: true })
     actived?: boolean;
+
+    @IsModelExist(RoleEntity, {
+        each: true,
+        always: true,
+        message: '角色不存在',
+    })
+    @IsUUID(undefined, {
+        each: true,
+        always: true,
+        message: '角色ID格式不正确',
+    })
+    @IsOptional({ always: true })
+    roles?: string[];
+
+    @IsModelExist(PermissionEntity, {
+        each: true,
+        always: true,
+        message: '权限不存在',
+    })
+    @IsUUID(undefined, {
+        each: true,
+        always: true,
+        message: '权限ID格式不正确',
+    })
+    @IsOptional({ always: true })
+    permissions?: string[];
 }
 
 /**

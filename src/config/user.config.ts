@@ -54,7 +54,7 @@ export const userConfig: () => UserConfig = () => ({
             ),
         },
         {
-            column: 'comment',
+            column: 'comments',
             relation: OneToMany(
                 () => CommentEntity,
                 (comment) => comment.user,
