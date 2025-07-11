@@ -5,9 +5,16 @@ import { ClassToPlain } from '@/modules/core/types';
 import { CaptchaType } from '../constants';
 import { Guest, ReqUser } from '../decorators';
 
-import { EmailBoundDto, PhoneBoundDto, UpdateAccountDto, UpdatePassword } from '../dtos';
+import {
+    EmailBoundDto,
+    PhoneBoundDto,
+    UpdateAccountDto,
+    UpdatePassword,
+    UploadAvatarDto,
+} from '../dtos';
 import { UserEntity } from '../entities';
 import { AuthService, UserService } from '../services';
+import { MediaService } from '@/modules/media/services';
 
 /**
  * 账户中心控制器
@@ -17,6 +24,7 @@ export class AccountController {
     constructor(
         protected readonly userService: UserService,
         protected readonly authService: AuthService,
+        protected mediaService: MediaService,
     ) {}
 
     @Guest()
@@ -110,6 +118,19 @@ export class AccountController {
             ...data,
             type: CaptchaType.EMAIL,
             value: data.email,
+        });
+    }
+
+    @Post('avatar')
+    async uploadAvatar(
+        @Body() { image }: UploadAvatarDto,
+        @ReqUser() user: ClassToPlain<UserEntity>,
+    ) {
+        return this.mediaService.upload({
+            file: image,
+            dir: 'avatars',
+            user,
+            relation: { entity: UserEntity, field: 'avatar', id: user.id },
         });
     }
 }

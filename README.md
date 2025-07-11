@@ -93,6 +93,59 @@ async update({ id, ...data }: UpdateUserDto) {
 }
 ```
 
+## NestJS 的核心概念
+
+### 依赖注入（DI，Dependency Injection）
+
+`依赖注入` 简单的解释就是把一个对象依赖的服务交给它,而不是自己本身来创建
+
+```ts
+// 没有DI
+class UserService {
+  private db = new Database();  // 这里耦合死了
+}
+
+// 有DI
+class UserService {
+  constructor(private db: Database) {} // 由外部传入
+}
+```
+
+### 在 NestJS 里的依赖注入
+
+`NestJS` 用 `装饰器` 和 `模块`来管理 `DI`
+
+```ts
+// Nest 会自动找到并创建 UserRepository，并注入进来, 不需要 new UserRepository()
+@Injectable()
+export class UserService {
+  constructor(private readonly userRepository: UserRepository) {}
+}
+```
+
+### NestJS 的容器（IoC Container）
+
+> `容器（Container`）就是用来 `存储` 和 `管理` 所有可注入依赖的地方
+
+当在类上用 `@Injectable()`: Nest 会注册到它的容器里
+
+当在构造函数里声明参数: Nest 会从容器里找出相应的依赖，自动帮你 `注入`
+
+### 容器分层：应用容器、模块容器
+
+Nest 设计是`模块化`的:
+
+- 一个 Nest 应用由很多模块组成
+- 每个模块可以有自己的“私有”提供者
+- 也可以暴露“公共”提供者给别的模块用
+
+为此，NestJS 的 DI 容器分了两层：
+
+1. 应用容器（Global Container）: 存放全局可用的依赖、所有模块都可以访问
+2. 模块容器（Module Container）: 每个模块有自己私有的容器, 存储这个模块自己的 providers, 只在这个模块和导入它的模块可用
+
+
+
 
 ## Nestjs 应用  
 
@@ -166,6 +219,59 @@ export class AuthService {
 }
 ```
 
+### @Global() 作用及解析
+
+> `@Global()` 装饰器把 这个模块里的所有提供者 变成 全局可用，让其他模块不用再手动 `imports` 就能使用
+
+NestJS 普通模块导入流程: 通常情况下，NestJS 的模块是封闭的, 模块提供的服务只能在自己或手动导入它的模块中使用。
+
+```ts
+@Module({
+  providers: [MediaService],
+  exports: [MediaService],
+})
+export class MediaModule {}
+
+// 在 AppModule imports MediaModule 才能使用里面的服务
+@Module({
+  imports: [MediaModule],
+})
+export class AppModule {}
+```
+
+
+`@Global()` 的作用: 所有其他模块里 不需要 在 imports 中写 MediaModule，就能直接用 MediaService
+
+```ts
+@Global()
+@Module({
+  providers: [MediaService],
+  exports: [MediaService],
+})
+export class MediaModule {}
+```
+
+#### 典型使用场景
+
+- 配置模块（ConfigModule）
+- 数据库连接模块（DatabaseModule）
+- 日志模块（LoggerModule）
+- 缓存模块（CacheModule）
+- MediaModule，存储服务、文件上传全局可用
+
+
+#### 原理解析
+
+Nest 的依赖注入容器分层：1.应用容器  2.模块容器
+
+当加了 `@Global()`: 1.这个模块里的提供者，会被注册到全局容器  2.所有模块的依赖查找都会先看模块容器找不到会去应用容器(全局容器)查找  3.所以不用手动在其他模块里写 imports 也能找到它的提供者
+
+
+#### 关键限制
+
+全局模块仍然需要在 `根模块` 里注册一次
+
+
 ## NestJS应用生命周期
 
 其生命周期由一系列内置钩子函数和模块管理机制组成，用于管理应用的启动、运行和销毁过程，以下是其主要的生命周期阶段
@@ -189,7 +295,7 @@ export class AuthService {
 - 调用 `app.close()` 时触发清理资源和连接
 
 
-## 什么时候需要用事务 来填充数据
+## 事务 来填充数据
 
 本仓库 使用事务来进行角色权限数据录入 的代码
 

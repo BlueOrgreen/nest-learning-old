@@ -10,10 +10,13 @@ async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
         logger: ['error', 'warn'],
     });
-    app.setGlobalPrefix('api');
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
-    app.enableCors();
     app.useWebSocketAdapter(new WsAdapter(app));
+    app.setGlobalPrefix('api');
+    // app.enableCors();
+    app.register(require('@fastify/multipart'), {
+        attachFieldsToBody: true,
+    });
     await app.listen(3100, '0.0.0.0');
 }
 bootstrap();

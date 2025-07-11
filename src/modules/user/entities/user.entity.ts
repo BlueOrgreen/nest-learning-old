@@ -5,8 +5,10 @@ import {
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    JoinColumn,
     ManyToMany,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -23,6 +25,7 @@ import { getUserConfig } from '../helpers';
 import { AccessTokenEntity } from './access-token.entity';
 import { MessageEntity } from './message.entity';
 import { MessagerecevieEntity } from './recevie.entity';
+import { MediaEntity } from '@/modules/media/entities';
 
 /**
  * 用户模型
@@ -102,6 +105,11 @@ export class UserEntity extends BaseEntity {
         cascade: true,
     })
     sends!: MessageEntity[];
+
+    @Expose()
+    @OneToOne(() => MediaEntity, (media) => media.member, { nullable: true })
+    @JoinColumn()
+    avatar?: MediaEntity;
 
     @OneToMany((type) => MessagerecevieEntity, (message) => message.recevier, { cascade: true })
     messages!: MessagerecevieEntity[];

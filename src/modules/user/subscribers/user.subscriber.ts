@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { DataSource, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
+import { EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
 
@@ -10,7 +10,7 @@ import { PermissionEntity, RoleEntity } from '@/modules/rbac/entities';
 
 import { UserEntity } from '../entities/user.entity';
 import { encrypt } from '../helpers';
-import { UserRepository } from '../repositories';
+// import { UserRepository } from '../repositories';
 
 /**
  * 用户模型监听器
@@ -23,9 +23,9 @@ export class UserSubscriber extends BaseSubscriber<UserEntity> {
         trash: true,
     };
 
-    constructor(protected dataSource: DataSource, protected userRepository: UserRepository) {
-        super(dataSource, userRepository);
-    }
+    // constructor(protected dataSource: DataSource, protected userRepository: UserRepository) {
+    //     super(dataSource, userRepository);
+    // }
 
     /**
      * 生成不重复的随机用户名

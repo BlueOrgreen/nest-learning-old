@@ -1,11 +1,11 @@
-import { DataSource, EventSubscriber } from 'typeorm';
+import { EventSubscriber } from 'typeorm';
 
 import { BaseSubscriber } from '@/modules/core/crud';
 
 import { SubcriberSetting } from '@/modules/core/types';
 
 import { CategoryEntity } from '../entities';
-import { CategoryRepository } from '../repositories';
+// import { CategoryRepository } from '../repositories';
 
 @EventSubscriber()
 export class CategorySubscriber extends BaseSubscriber<CategoryEntity> {
@@ -16,10 +16,10 @@ export class CategorySubscriber extends BaseSubscriber<CategoryEntity> {
         trash: true,
     };
 
-    constructor(
-        protected dataSource: DataSource,
-        protected categoryRepository: CategoryRepository,
-    ) {
-        super(dataSource, categoryRepository);
-    }
+    // constructor(
+    //     protected dataSource: DataSource,
+    //     protected categoryRepository: CategoryRepository,
+    // ) {
+    //     super(dataSource, categoryRepository);
+    // }
 }

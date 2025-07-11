@@ -1,5 +1,6 @@
 import { ArgumentMetadata, Injectable, Paramtype, ValidationPipe } from '@nestjs/common';
 import merge from 'deepmerge';
+import { isObject, omit } from 'lodash';
 
 import { DTO_VALIDATION_OPTIONS } from '../constants';
 
@@ -35,9 +36,18 @@ export class AppPipe extends ValidationPipe {
         this.validatorOptions = merge(this.validatorOptions, customOptions ?? {}, {
             arrayMerge: (_d, s, _o) => s,
         });
-
+        // console.log('value vaalidator====>1', value);
+        const toValidate = isObject(value)
+            ? Object.fromEntries(
+                  Object.entries(value as Record<string, any>).map(([key, v]) => {
+                      if (!isObject(v) || !('mimetype' in v)) return [key, v];
+                      return [key, omit(v, ['fields'])];
+                  }),
+              )
+            : value;
         // 序列化并验证dto对象
-        let result = await super.transform(value, metadata);
+        // console.log('value vaalidator====>22222', toValidate);
+        let result = await super.transform(toValidate, metadata);
         // 如果dto类的中存在transform静态方法,则返回调用进一步transform之后的结果
         if (typeof result.transform === 'function') {
             result = await result.transform(result);

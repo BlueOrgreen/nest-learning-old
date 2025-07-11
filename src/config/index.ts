@@ -9,3 +9,4 @@ export * from './sms.config';
 export * from './queue.config';
 export * from './smtp.config';
 export * from './redis.config';
+export * from './media.config';

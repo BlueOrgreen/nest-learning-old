@@ -32,6 +32,9 @@ const guards = Object.values(guardMaps);
 const subscribers = Object.values(subscriberMaps);
 const controllers = Object.values(controllerMaps);
 const queue = Object.values(queueMaps);
+
+console.log('UserModule=subscribers===>', subscribers);
+
 @Module({
     imports: [
         loadEntities(entities),

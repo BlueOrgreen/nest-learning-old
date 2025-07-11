@@ -2,10 +2,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 import { isNil } from 'lodash';
 import { IPaginationMeta, Pagination } from 'nestjs-typeorm-paginate';
-import { DataSource, DataSourceOptions, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import {
+    DataSource,
+    DataSourceOptions,
+    ObjectLiteral,
+    ObjectType,
+    Repository,
+    SelectQueryBuilder,
+} from 'typeorm';
 
-import { ADDTIONAL_RELATIONS } from '@/modules/core/constants';
-import { DynamicRelation } from '@/modules/core/types';
+import { ADDTIONAL_RELATIONS, CUSTOM_REPOSITORY_METADATA } from '@/modules/core/constants';
+import { ClassType, DynamicRelation } from '@/modules/core/types';
 
 import { OrderQueryType, PaginateDto } from './types';
 
@@ -131,4 +138,20 @@ export const addEntities = (entities: EntityClassOrSchema[] = [], dataSource = '
         return e;
     });
     return TypeOrmModule.forFeature(es, dataSource);
+};
+
+/**
+ * 获取自定义Repository的实例
+ * @param dataSource 数据连接池
+ * @param Repo repository类
+ */
+export const getCustomRepository = <T extends Repository<E>, E extends ObjectLiteral>(
+    dataSource: DataSource,
+    Repo: ClassType<T>,
+): T => {
+    if (isNil(Repo)) return null;
+    const entity = Reflect.getMetadata(CUSTOM_REPOSITORY_METADATA, Repo);
+    if (!entity) return null;
+    const base = dataSource.getRepository<ObjectType<any>>(entity);
+    return new Repo(base.target, base.manager, base.queryRunner) as T;
 };

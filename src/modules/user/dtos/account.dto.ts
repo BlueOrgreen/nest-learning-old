@@ -6,6 +6,7 @@ import { DtoValidation } from '@/modules/core/decorators';
 import { CaptchaDtoGroups, UserDtoGroups } from '../constants';
 
 import { GuestDto } from './guest.dto';
+import { UploadFileDto } from '@/modules/media/dtos';
 
 /**
  * 对手机/邮箱绑定验证码进行验证
@@ -39,3 +40,5 @@ export class UpdatePassword extends PickType(GuestDto, ['password', 'plainPasswo
     })
     oldPassword!: string;
 }
+
+export class UploadAvatarDto extends PickType(UploadFileDto, ['image']) {}

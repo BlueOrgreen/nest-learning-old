@@ -14,11 +14,14 @@ import {
     OneToOne,
     OneToMany,
     ManyToOne,
+    Repository,
+    TreeRepository,
 } from 'typeorm';
 
 import { OrderQueryType, QueueOptions, RedisOptions } from '@/helpers/types';
 
 import { QueryTrashMode } from './constants';
+import { BaseRepository, BaseTreeRepository } from './crud';
 
 /** ****************************** 常用类型 **************************** */
 
@@ -69,6 +72,15 @@ export type SmsOptions<T extends NestedRecord = RecordNever> = {
     region: string;
     endpoint?: string;
 } & T;
+
+/**
+ * Repository类型
+ */
+export type RepositoryType<E extends ObjectLiteral> =
+    | Repository<E>
+    | TreeRepository<E>
+    | BaseRepository<E>
+    | BaseTreeRepository<E>;
 
 /**
  * 发送接口参数

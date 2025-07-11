@@ -6,7 +6,7 @@ import { SubcriberSetting } from '@/modules/core/types';
 
 import { PostBodyType } from '../constants';
 import { PostEntity } from '../entities';
-import { PostRepository } from '../repositories/post.repository';
+// import { PostRepository } from '../repositories/post.repository';
 import { SanitizeService } from '../services';
 
 /**
@@ -24,13 +24,17 @@ export class PostSubscriber extends BaseSubscriber<PostEntity> {
         trash: true,
     };
 
-    constructor(
-        protected dataSource: DataSource,
-        protected sanitizeService: SanitizeService,
-        protected postRepository: PostRepository,
-    ) {
-        super(dataSource, postRepository);
+    constructor(dataSource?: DataSource, protected sanitizeService?: SanitizeService) {
+        super(dataSource);
     }
+
+    // constructor(
+    //     protected dataSource: DataSource,
+    //     protected sanitizeService: SanitizeService,
+    //     protected postRepository: PostRepository,
+    // ) {
+    //     super(dataSource, postRepository);
+    // }
 
     /**
      * @description 加载文章数据的处理

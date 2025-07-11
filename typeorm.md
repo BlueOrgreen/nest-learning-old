@@ -156,3 +156,53 @@ export class AuthService {
     }
 }
 ```
+
+## relation、of
+
+示例代码
+
+```tsx
+ async create({ roles, permissions, ...data }: CreateUserDto) {
+        const user = await this.userRepository.save(omit(data, ['isFirst']), { reload: true });
+        if (isArray(roles) && roles.length > 0) {
+            await this.userRepository
+                .createQueryBuilder('user')
+                .relation('roles')
+                .of(user)
+                .add(roles);
+        }
+        if (isArray(permissions) && permissions.length > 0) {
+            await this.userRepository
+                .createQueryBuilder('user')
+                .relation('permissions')
+                .of(user)
+                .add(permissions);
+        }
+        await this.syncActived(await this.detail(user.id));
+        return this.detail(user.id);
+    }
+```
+
+解析:
+
+#### ✅ 先看最简单例子
+
+```tsx
+await dataSource
+  .createQueryBuilder()
+  .relation(User, "photos")
+  .of(userId)
+  .add(photoId);
+```
+
+`relation`  它不是写普通的 SQL，而是专门用来 `修改实体之间的关系`的。
+
+你可以用它来：1.添加关系  2.移除关系  3.同步关系
+
+比如：1.多对多关系表里插/删中间表数据  2.一对多 / 多对一 外键更新
+
+
+上述代码解释:
+
+> 把 photoId 这张图片加到 userId 的用户的 photos 关系里. 👉 等价于 SQL 里的往 user_photos 的中间表插一条记录
+
