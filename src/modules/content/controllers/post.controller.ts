@@ -20,12 +20,7 @@ import { In } from 'typeorm';
 import { RbacCrud } from '@/modules/rbac/decorators/rbac-crud.decorator';
 
 const createChecker: PermissionChecker = async (ab) => {
-    console.log(
-        'createChecker=====>ability',
-        PermissionAction.CREATE,
-        ab.can(PermissionAction.CREATE, PostEntity.name),
-        PostEntity.name,
-    );
+    console.log('createChecker====>', ab, PostEntity.name);
 
     return ab.can(PermissionAction.CREATE, PostEntity.name);
 };
@@ -55,7 +50,7 @@ const option: RbacCurdOption = {
     id: 'post',
     enabled: [
         { name: 'list', option: { allowGuest: true } },
-        { name: 'detail', option: { allowGuest: true } },
+        { name: 'detail' },
         { name: 'store', option: { rbac: [createChecker] } },
         { name: 'update', option },
         { name: 'delete', option },

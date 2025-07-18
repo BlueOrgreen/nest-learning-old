@@ -45,7 +45,7 @@ export class RbacGuard extends JwtAuthGuard {
         // 从控制器上提取权限检查器
         const checkers = getCheckers(context, this.reflector);
         if (isNil(checkers) || checkers.length <= 0) return true;
-        console.log('checkers===>', checkers);
+        // console.log('checkers===>', checkers);
 
         request = context.switchToHttp().getRequest();
         if (isNil(request.user)) return false;
@@ -59,7 +59,7 @@ export class RbacGuard extends JwtAuthGuard {
                 id: request.user.id,
             },
         });
-        console.log('Yf======>user', user);
+        // console.log('Yf======>user', user);
 
         return solveChecker({
             resolver: this.resolver,

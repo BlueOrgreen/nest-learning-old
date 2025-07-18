@@ -53,6 +53,8 @@ export const solveChecker = async ({
         if (o.find(({ name }) => name === n.name)) return o;
         return [...o, n];
     }, []);
+    console.log('resolver======>', resolver);
+
     // 将权限规则转成 CASL 的能力定义格式 Ability<[action, subject]>，比如：
     // { action: 'read', subject: 'Article', conditions: {...} }
     const ability = createMongoAbility(
@@ -64,9 +66,12 @@ export const solveChecker = async ({
             return rule;
         }),
     );
+    console.log('ability====>', ability);
     const results = await Promise.all(
         checkers.map(async (checker) => execChecker(checker, ability, moduleRef, request)),
     );
+    console.log('asdasdasda====>', results);
+
     return results.every((r) => !!r);
 };
 

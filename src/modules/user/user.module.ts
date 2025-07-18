@@ -22,6 +22,7 @@ import * as RepositoryMaps from './repositories';
 import * as serviceMaps from './services';
 import * as strategyMaps from './strategies';
 import * as subscriberMaps from './subscribers';
+import { UserRbac } from './rbac';
 
 const entities = Object.values(entityMaps);
 const repositories = Object.values(RepositoryMaps);
@@ -32,8 +33,6 @@ const guards = Object.values(guardMaps);
 const subscribers = Object.values(subscriberMaps);
 const controllers = Object.values(controllerMaps);
 const queue = Object.values(queueMaps);
-
-console.log('UserModule=subscribers===>', subscribers);
 
 @Module({
     imports: [
@@ -62,6 +61,7 @@ console.log('UserModule=subscribers===>', subscribers);
         //     provide: APP_GUARD,
         //     useClass: JwtAuthGuard,
         // },
+        UserRbac,
         MessageGateWay,
     ],
     controllers,

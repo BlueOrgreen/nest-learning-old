@@ -206,3 +206,67 @@ await dataSource
 
 > 把 photoId 这张图片加到 userId 的用户的 photos 关系里. 👉 等价于 SQL 里的往 user_photos 的中间表插一条记录
 
+
+### 查询用户信息 (users表与roles表多对多关系) (roles表与permissions表多对多关系)
+
+```sql
+SELECT 
+  u.id AS user_id,
+  u.username AS user_name,
+  r.id AS role_id,
+  r.`name` AS role_name,
+	r.description AS role_description,
+	r.label AS role_label,
+	p.`name` AS permission_name,
+	p.label AS permission_label,
+	p.description AS permission_description
+FROM
+  users u
+  JOIN rbac_roles_users_users ruu ON u.id = ruu.usersId
+	JOIN rbac_roles r ON r.id = ruu.rbacRolesId
+	JOIN rbac_permissions_roles_rbac_roles rp ON r.id = rp.rbacRolesId
+	JOIN rbac_permissions p ON p.id = rp.rbacPermissionsId
+WHERE
+  u.username = 'yunfan';
+```
+
+```tsx
+await userRepository.findOne({
+  where: { name: 'yunfan' },
+  relations: ['roles', 'roles.permissions', 'permissions']
+});
+
+// 结果类似于
+const result = {
+  "id": "...",
+  "name": "yunfan",
+  "roles": [
+    {
+      "id": "...",
+      "name": "...",
+      "permissions": [
+        { "id": "...", "name": "..." },
+        ...
+      ]
+    },
+    ...
+  ],
+  "permissions": [
+    { "id": "...", "name": "..." },
+    ...
+  ]
+}
+
+```
+
+✅ QueryBuilder 版
+
+```tsx
+await userRepository
+  .createQueryBuilder('user')
+  .leftJoinAndSelect('user.roles', 'role')
+  .leftJoinAndSelect('role.permissions', 'rolePermission')
+  .leftJoinAndSelect('user.permissions', 'userPermission')
+  .where('user.name = :name', { name: 'yunfan' })
+  .getOne();
+```

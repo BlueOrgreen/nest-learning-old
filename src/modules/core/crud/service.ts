@@ -60,6 +60,8 @@ export abstract class BaseService<
      * @param {QueryHook<E>} [callback]
      */
     async list(params?: P, callback?: QueryHook<E>): Promise<E[]> {
+        console.log('sadasd');
+
         const options = params ?? ({} as P);
         // @ts-ignore
         const queryName = this.repository.getQBName();

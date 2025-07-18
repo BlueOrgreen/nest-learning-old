@@ -124,7 +124,7 @@ export class RbacResolver<A extends AbilityTuple = AbilityTuple, C extends Mongo
             // console.log('syncRoles ===role ===>', role, item.name);
 
             if (isNil(role)) {
-                console.log('YUnfan');
+                // console.log('YUnfan');
 
                 role = await manager.save(
                     manager.create(RoleEntity, {
@@ -157,7 +157,7 @@ export class RbacResolver<A extends AbilityTuple = AbilityTuple, C extends Mongo
      */
     protected async syncPermissions(manager: EntityManager) {
         const superAdmin = getUserConfig<UserConfig['super']>('super');
-        console.log(superAdmin);
+        console.log('syncPermissions====>yf', superAdmin);
         const permissions = await manager.find(PermissionEntity);
         const roles = await manager.find(RoleEntity, {
             relations: ['permissions'],
